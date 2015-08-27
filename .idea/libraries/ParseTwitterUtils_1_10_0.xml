@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ParseTwitterUtils-1.10.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ParseLoginUI/libs/ParseTwitterUtils-1.10.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

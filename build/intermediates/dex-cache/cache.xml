@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\gson-2.2.4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a60a5e993c98c864010053cb901b7eab25306568">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\gson-2.2.4-7407e48ad05f5d250828640c1e776af341e1e8d4.jar" />
+    </item>
+    <item
+        jar="C:\Users\siddardha\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-2d63652e0878a35a92de23e02adfe8957e1a3d6c.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-7b28883812a6edd79f62f903d4d1e9d13f493f4c.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-97b6bfc491962642f3f25d5a78be11dd0fba3790.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\flurry-analytics-4.1.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0da490dfcae8989ae918b7a9c5115853ab098d27">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\flurry-analytics-4.1.0-6051fc4f9cd74d621fd0cd03a4b5e9a0e00e5e1c.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\javax.inject-1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="6975da39a7040257bd51d21a231b76c915872d38">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\javax.inject-1-698c3bd50d2b0c369147a4a07ef3e283187d04d1.jar" />
+    </item>
+    <item
+        jar="C:\Users\siddardha\.gradle\caches\modules-2\files-2.1\com.parse.bolts\bolts-android\1.2.1\44780c2cf98f6a3cf4e77f1234d644758b329201\bolts-android-1.2.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="44780c2cf98f6a3cf4e77f1234d644758b329201">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\bolts-android-1.2.1-f20556d2f6a2b75d2e493416138dc2cbfc29035b.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\ParseLoginUI\libs\ParseFacebookUtilsV4-1.10.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0b531ff97a4b71df96a4d794c657703b2a347d7c">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\ParseFacebookUtilsV4-1.10.0-2d9521995f892f94bfe019670b5c66bf204c3f3b.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-b1dfa22a8160a1d4f6bd5d3d61b2839ba681dfeb.jar" />
+    </item>
+    <item
+        jar="C:\Users\siddardha\.gradle\caches\modules-2\files-2.1\com.parse\parse-android\1.10.0\79943588a3824033b3d813f43859ad1cffc6b557\parse-android-1.10.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="79943588a3824033b3d813f43859ad1cffc6b557">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\parse-android-1.10.0-cc81a8dbc3f092f2323cb72ed91afe7a3ce37637.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\ParseLoginUI\libs\ParseFacebookUtilsV4-1.10.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0b531ff97a4b71df96a4d794c657703b2a347d7c">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\ParseFacebookUtilsV4-1.10.0-d14211ef287c02680f3ca52c9f0d7f5e6564f3f6.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\dagger-1.2.2.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="e8f912ee19ad84958510883ea191135276b091f8">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\dagger-1.2.2-cba6f16d2975eea67183266e17568a20cce1e48a.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\ExpressionSurveyAffectiva\ParseLoginUI\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="9b67ad305a15603ccaee829337564ff2026bdf43">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-089cba37fce848a70d660abcdcbcbfa91a5b0409.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.facebook.android\facebook-android-sdk\4.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f7188fc9a524a8f965b5aeab74879036f0431080">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-a51c39b4b0c647ca269a0555323e4d2e8d802d73.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\ParseCrashReporting-1.10.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0fe2cb2f4a1129a24249cef694cba6355ce97f25">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\ParseCrashReporting-1.10.1-b32b42c4ccdc33795087b7df3124526a3ddf2764.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\ParseLoginUI\libs\ParseTwitterUtils-1.10.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="5336b15186de874d314134e9ea6082da3dde4a1e">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\ParseTwitterUtils-1.10.0-8e73d595eb9840066104b5940c37b41162ecbf97.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\Affdex-sdk-javadoc.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f944ca36ebf7d00e7f085ce9db71d9deedd3b45b">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\Affdex-sdk-javadoc-372837da65dc988cc6b14a87db011d435f3e816b.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\Affdex-sdk.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="32e0379f0536aa99a1cb8e17be77f7fecb80bc20">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\Affdex-sdk-f249182a3f2110330048808c47a0cffa0801d6ff.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-699570307b8810f6be3ffc96237048eca827effa.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.facebook.android\facebook-android-sdk\4.0.1\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f7188fc9a524a8f965b5aeab74879036f0431080">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-35315b4824a8be410ecf431a86204867b2d2c224.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\flurry-analytics-4.1.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0da490dfcae8989ae918b7a9c5115853ab098d27">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\flurry-analytics-4.1.0-83757cd4d8c16020e9ae73805f2758c33134910d.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\libs\internal_impl-22.2.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-6daafbbf91de0dd3ed84c660b5dc81abbbd121a0.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\Affdex-sdk.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="32e0379f0536aa99a1cb8e17be77f7fecb80bc20">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\Affdex-sdk-36a5910df980c2197437a504d54590fdb6b146a9.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\gson-2.2.4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a60a5e993c98c864010053cb901b7eab25306568">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\gson-2.2.4-d50ece850e0ae361b1293db4eb06299faf0f1a46.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\ExpressionSurveyAffectiva\ParseLoginUI\unspecified\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="91861ad2305ad4ebfb3eda00011392744abfa9a5">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-5a0349a9c5ab192b13a1f41e9ade84b0733bc58b.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\dagger-1.2.2.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="e8f912ee19ad84958510883ea191135276b091f8">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\dagger-1.2.2-104a02a145781ad092d5d90e6659f6725ea0963f.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\Affdex-sdk-javadoc.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f944ca36ebf7d00e7f085ce9db71d9deedd3b45b">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\Affdex-sdk-javadoc-edd013c523dbab5de4e668929872d729e19557af.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\libs\javax.inject-1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="6975da39a7040257bd51d21a231b76c915872d38">
+        <dex dex="C:\Work\FacialExpression\affdexme-android\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\javax.inject-1-525b5dd92bd9a8d8147329e34ee7eaf0eabeab07.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\libs\ParseCrashReporting-1.10.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="0fe2cb2f4a1129a24249cef694cba6355ce97f25">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\ParseCrashReporting-1.10.1-76f57c6ea89db3082c925fae83531bedd2987505.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\ParseLoginUI\libs\ParseTwitterUtils-1.10.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="5336b15186de874d314134e9ea6082da3dde4a1e">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\ParseTwitterUtils-1.10.0-66e502d1ffe91fee27c0800ef64f1fc80e52ba12.jar" />
+    </item>
+    <item
+        jar="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
+        <dex dex="C:\Work\FacialExpression\ExpressionSurveyAffectiva\app\build\intermediates\pre-dexed\debug\classes-a0d28d1c91f8540142e918f8d194ef3dc6fa1693.jar" />
+    </item>
+
+</items>

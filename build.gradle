@@ -1,0 +1,33 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.3'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+ext {
+    compileSdkVersion = 21
+    buildToolsVersion = "21.1.1"
+
+    minSdkVersion = 9
+    targetSdkVersion = 21
+
+    facebookSDK = 'com.facebook.android:facebook-android-sdk:4.0.1'
+    androidSupport = 'com.android.support:support-v4:22.0.0'
+    bolts = 'com.parse.bolts:bolts-android:1.2.0'
+    parse = 'com.parse:parse-android:1.10.0'
+    parseFacebookUtilsPath = "$rootProject.projectDir/ParseLoginUI/libs/ParseFacebookUtilsV4-1.10.0.jar"
+    parseTwitterUtilsPath = "$rootProject.projectDir/ParseLoginUI/libs/ParseTwitterUtils-1.10.0.jar"
+}

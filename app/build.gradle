@@ -1,0 +1,45 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "sid.expressionsurveyaffectiva"
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+/*    facebookSDK = 'com.facebook.android:facebook-android-sdk:4.0.1'
+    androidSupport = 'com.android.support:support-v4:22.0.0'
+    bolts = 'com.parse.bolts:bolts-android:1.2.0'
+    parse = 'com.parse:parse-android:1.10.0'
+    parseFacebookUtilsPath = "$rootProject.projectDir/ParseLoginUI/libs/ParseFacebookUtilsV4-1.10.0.jar"
+    parseTwitterUtilsPath = "$rootProject.projectDir/ParseLoginUI/libs/ParseTwitterUtils-1.10.0.jar"
+*/
+    compile rootProject.ext.facebookSDK
+    compile project(':ParseLoginUI')
+    compile rootProject.ext.androidSupport
+    compile rootProject.ext.parse
+    compile files(rootProject.ext.parseFacebookUtilsPath)
+    compile files(rootProject.ext.parseTwitterUtilsPath)
+
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile fileTree(dir: 'libs', include: ['Affdex*.jar'])
+    compile fileTree(dir: 'libs', include: ['dagger*.jar'])
+    compile fileTree(dir: 'libs', include: ['flurry*.jar'])
+    compile fileTree(dir: 'libs', include: ['gson*.jar'])
+    compile fileTree(dir: 'libs', include: ['javax*.jar'])
+    compile fileTree(dir: 'libs', include: ['ParseCrash*.jar'])
+
+}
