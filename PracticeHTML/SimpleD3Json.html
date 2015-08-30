@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+
+var jsonCircles = [
+  { "x_axis": 30, "y_axis": 30, "radius": 20, "color" : "green" },
+  { "x_axis": 70, "y_axis": 70, "radius": 20, "color" : "purple"},
+  { "x_axis": 110, "y_axis": 100, "radius": 20, "color" : "red"}];
+
+var svgContainer = d3.select("body").append("svg")
+                                    .attr("width", 200)
+                                    .attr("height", 200);
+
+var circles = svgContainer.selectAll("circle")
+                          .data(jsonCircles)
+                          .enter()
+                          .append("circle");
+
+var circleAttributes = circles
+                       .attr("cx", function (d) { return d.x_axis; })
+                       .attr("cy", function (d) { return d.y_axis; })
+                       .attr("r", function (d) { return d.radius; })
+                       .style("fill", function(d) { return d.color; });		  
+
+var jsonEmotionData =  [
+{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":4.6064365E-8,"browRaiseScore":0.014035389,"engagementScore":0.014035389,"lipCornerDepressorScore":6.1802837E-7,"smileScore":1.7137529E-4,"valenceScore":1.7075727E-4}},
+{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":5.7544094E-7,"browRaiseScore":0.049801987,"engagementScore":0.049801987,"lipCornerDepressorScore":3.966843E-7,"smileScore":6.275623E-4,"valenceScore":6.2698685E-4}},
+{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":1.4312503E-6,"browRaiseScore":0.10172332,"engagementScore":0.10172332,"lipCornerDepressorScore":9.4728244E-7,"smileScore":0.020072114,"valenceScore":0.020070683}},
+{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":5.133669E-8,"browRaiseScore":0.102448,"engagementScore":0.102448,"lipCornerDepressorScore":9.09555E-7,"smileScore":0.0081721535,"valenceScore":0.008171244}},
+{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":1.1835573E-7,"browRaiseScore":0.08215268,"engagementScore":0.08215268,"lipCornerDepressorScore":1.8193288E-7,"smileScore":0.024006339,"valenceScore":0.024006158}}
+]
+
+var margin = {top: 20, right: 80, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var parseDate = d3.time.format("%Y%m%d").parse;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var color = d3.scale.category10();
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+var line = d3.svg.line()
+    .interpolate("basis")
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.temperature); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var data = jsonEmotionData;
+	
+color.domain(d3.keys(data[0]));
+
+  data.forEach(function(d) {
+    d.date = parseDate(d.datetime);
+  });
+
+  var cities = color.domain().map(function(name) {
+    return {
+      name: name,
+      values: data.map(function(d) {
+        return {date: d.date, temperature: +d[name]};
+      })
+    };
+  });
+
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+
+  y.domain([
+    d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
+    d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+  ]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Temperature (ºF)");
+
+  var city = svg.selectAll(".city")
+      .data(cities)
+    .enter().append("g")
+      .attr("class", "city");
+
+  city.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .style("stroke", function(d) { return color(d.name); });
+
+  city.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
+      .attr("x", 3)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; });
+					   
+</script>
+</body>
