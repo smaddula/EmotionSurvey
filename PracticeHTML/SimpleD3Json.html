@@ -49,18 +49,18 @@ var circleAttributes = circles
                        .style("fill", function(d) { return d.color; });		  
 
 var jsonEmotionData =  [
-{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":4.6064365E-8,"browRaiseScore":0.014035389,"engagementScore":0.014035389,"lipCornerDepressorScore":6.1802837E-7,"smileScore":1.7137529E-4,"valenceScore":1.7075727E-4}},
-{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":5.7544094E-7,"browRaiseScore":0.049801987,"engagementScore":0.049801987,"lipCornerDepressorScore":3.966843E-7,"smileScore":6.275623E-4,"valenceScore":6.2698685E-4}},
-{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":1.4312503E-6,"browRaiseScore":0.10172332,"engagementScore":0.10172332,"lipCornerDepressorScore":9.4728244E-7,"smileScore":0.020072114,"valenceScore":0.020070683}},
-{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":5.133669E-8,"browRaiseScore":0.102448,"engagementScore":0.102448,"lipCornerDepressorScore":9.09555E-7,"smileScore":0.0081721535,"valenceScore":0.008171244}},
-{"datetime":"Aug 26, 2015 10:37:11 PM","score":{"browFurrowScore":1.1835573E-7,"browRaiseScore":0.08215268,"engagementScore":0.08215268,"lipCornerDepressorScore":1.8193288E-7,"smileScore":0.024006339,"valenceScore":0.024006158}}
+{"datetime":"2015-08-30T02:21:47.146Z","score":{"browFurrowScore":4.6064365E-8,"browRaiseScore":0.014035389,"engagementScore":0.014035389,"lipCornerDepressorScore":6.1802837E-7,"smileScore":1.7137529E-4,"valenceScore":1.7075727E-4}},
+{"datetime":"2015-08-30T02:21:47.283Z","score":{"browFurrowScore":5.7544094E-7,"browRaiseScore":0.049801987,"engagementScore":0.049801987,"lipCornerDepressorScore":3.966843E-7,"smileScore":6.275623E-4,"valenceScore":6.2698685E-4}},
+{"datetime":"2015-08-30T02:21:47.500Z","score":{"browFurrowScore":1.4312503E-6,"browRaiseScore":0.10172332,"engagementScore":0.10172332,"lipCornerDepressorScore":9.4728244E-7,"smileScore":0.020072114,"valenceScore":0.020070683}},
+{"datetime":"2015-08-30T02:21:47.700Z","score":{"browFurrowScore":5.133669E-8,"browRaiseScore":0.102448,"engagementScore":0.102448,"lipCornerDepressorScore":9.09555E-7,"smileScore":0.0081721535,"valenceScore":0.008171244}},
+{"datetime":"2015-08-30T02:21:47.900Z","score":{"browFurrowScore":1.1835573E-7,"browRaiseScore":0.08215268,"engagementScore":0.08215268,"lipCornerDepressorScore":1.8193288E-7,"smileScore":0.024006339,"valenceScore":0.024006158}}
 ]
 
 var margin = {top: 20, right: 80, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var parseDate = d3.time.format("%Y%m%d").parse;
+var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 
 var x = d3.time.scale()
     .range([0, width]);

@@ -47,6 +47,7 @@ import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
@@ -63,7 +64,7 @@ public class MainActivity extends ActionBarActivity
     static String FolderPath;
     List<TimeStampScorePair> framesScore = new ArrayList<TimeStampScorePair>();
     List<Question> allQuestions = new ArrayList<Question>();
-    Gson gson = new Gson();
+    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -222,7 +223,6 @@ public class MainActivity extends ActionBarActivity
         //    out.write(smileTimeScore.getLine() + "\n");
         //}
         //out.close();
-
         ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(framesScore).getBytes());
         emotionFrameData.save();
 
