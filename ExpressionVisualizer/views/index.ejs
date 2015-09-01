@@ -92,6 +92,10 @@
 
         $(document).ready(function () {
             $.get('data/Users', function (data) {
+                $('#selectUser').append($('<option>', {
+                    value: "",
+                    text: ""
+                }));
                 $.each(data, function (i, item) {
                     $('#selectUser').append($('<option>', {
                         value: item.objectId,
@@ -102,7 +106,14 @@
             });
             $('#selectUser').change(function () {
                         var val1 = $('#selectUser option:selected').val();
-
+                        $('#selectSurvey').empty();
+                        $('#selectSurvey').append($('<option>', {
+                            value: "",
+                            text: ""
+                        }));
+                        if(val1 === ""){
+                            return;
+                        }
                         $('#selectSurvey').show();
                         $.get('data/Surveys/' + val1, function (data) {
                             $.each(data, function (i, item) {
@@ -118,7 +129,9 @@
 
             $('#selectSurvey').change(function () {
                         var val1 = $('#selectSurvey option:selected').val();
-
+                        if(val1 === ""){
+                            return;
+                        }
                         $.get('data/SurveyData/' + val1, function (data) {
                             var margin = {top: 20, right: 80, bottom: 30, left: 50},
                                     width = 960 - margin.left - margin.right,
@@ -147,7 +160,7 @@
                                     .x(function(d) { return x(d.time); })
                                     .y(function(d) { return y(d.emotionScore); });
 
-                            var svg = d3.select("body").append("svg")
+                            var svg = d3.select("#chart").insert("svg",":first-child")
                                     .attr("width", width + margin.left + margin.right)
                                     .attr("height", height + margin.top + margin.bottom)
                                     .append("g")
@@ -232,16 +245,15 @@
     </script>
 </head>
 <body>
-<h1><%= title %></h1>
-
-<p>Welcome to <%= title %></p>
-
+<h3> Visualizations of the survey </h3>
     <select id="selectUser" >
     </select>
 
     <select id="selectSurvey">
     </select>
+<div id="chart">
 
+</div>
 <div id="jsonDataDisplay">
     </div>
 </body>
