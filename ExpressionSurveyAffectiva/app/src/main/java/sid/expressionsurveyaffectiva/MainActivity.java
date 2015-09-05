@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -56,7 +57,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
     static int segmentId;
