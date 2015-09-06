@@ -1,40 +1,21 @@
 package sid.expressionsurveyaffectiva;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -50,12 +31,14 @@ import com.affectiva.android.affdex.sdk.detector.Face;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import sid.UserSurveyData.FrameInformation;
+import sid.UserSurveyData.FullSurveyData;
+import sid.UserSurveyData.TimeStampFrameInformationPair;
 
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
@@ -63,9 +46,10 @@ public class MainActivity extends Activity
     static int segmentId;
     static String APP_UUID = UUID.randomUUID().toString();
     static String FolderPath;
-    List<TimeStampScorePair> framesScore = new ArrayList<TimeStampScorePair>();
+    FullSurveyData userData = new FullSurveyData();
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+    Question currentQuestion;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -80,6 +64,7 @@ public class MainActivity extends Activity
     /**
      * The {@link ViewPager} that will host the section contents.
      */
+
     ViewPager mViewPager;
 
     private SurfaceView cameraPreview;
@@ -117,9 +102,9 @@ public class MainActivity extends Activity
         }
 
         Face face = faces.get(0);
-        Date date = new Date();
-        framesScore.add( new TimeStampScorePair(date, new FrameInformation( face.getSmileScore() ,face.getBrowFurrowScore() ,
-               face.getBrowRaiseScore() ,face.getValenceScore(), face.getEngagementScore(), face.getLipCornerDepressorScore()))) ;
+        userData.AddFrameData(currentQuestion, new FrameInformation(face.getSmileScore(), face.getBrowFurrowScore(),
+                face.getBrowRaiseScore(), face.getValenceScore(), face.getEngagementScore(), face.getLipCornerDepressorScore()));
+
     }
 
     @Override
@@ -182,7 +167,7 @@ public class MainActivity extends Activity
                 if (e == null) {
                     // object will be your game score
                     for (ParseObject obj : objectList) {
-                        allQuestions.add(new Question(obj.getString("ImageURI"), obj.getString("Title")));
+                        allQuestions.add(new Question(obj.getString("ImageURI"), obj.getString("Title"),obj));
                     }
                     loadData();
                 } else {
@@ -220,11 +205,12 @@ public class MainActivity extends Activity
         //String Header = "date\tsmile\tbrowfurrow\tbrowrise\tvalence\tengagement\tlipcornerdepressor";
         //OutputStreamWriter out = new OutputStreamWriter(os);
         //out.write(Header + "\n");
-        //for(TimeStampScorePair smileTimeScore: framesScore){
+        //for(TimeStampFrameInformationPair smileTimeScore: framesScore){
         //    out.write(smileTimeScore.getLine() + "\n");
         //}
         //out.close();
-        ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(framesScore).getBytes());
+        String result = gson.toJson(userData);
+        ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
         emotionFrameData.save();
 
         ParseObject userSurvey = new ParseObject("SurveyData");
@@ -237,11 +223,11 @@ public class MainActivity extends Activity
     {
         if(allQuestions.size()==0)
             return;
-        Question question = allQuestions.get( segmentId );
+        currentQuestion = allQuestions.get( segmentId );
         ImageView imageView = ((ImageView) findViewById(R.id.image));//.setImageURI(Uri.parse(getArguments().getString(ARG_IMAGE_SOURCE)));
         new DownloadImageTask(imageView)
-                .execute(question.ImageURI);
-        ((TextView)findViewById(R.id.text_view)).setText( question.QuestionHeading);
+                .execute(currentQuestion.ImageURI);
+        ((TextView)findViewById(R.id.text_view)).setText( currentQuestion.QuestionHeading);
 
         if(segmentId == allQuestions.size() - 1)
         {
