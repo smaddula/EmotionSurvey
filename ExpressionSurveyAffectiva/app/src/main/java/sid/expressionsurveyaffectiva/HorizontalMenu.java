@@ -4,10 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 /**
  * TODO: document your custom view class.
@@ -26,16 +35,23 @@ public class HorizontalMenu extends LinearLayout {
                 new OnClickListener(  ) {
                     @Override
                     public void onClick(View arg0) {
-                        ClickViewVisualizations();
+                        try {
+                            ClickViewVisualizations();
+                        } catch (ParseException e) {
+                            Toast.makeText(getContext(),"Issue in getting latest Survey",Toast.LENGTH_SHORT).show();
+                        }
                     }
         });
 
     }
 
-    public void ClickViewVisualizations( ){
-        String url = "http://www.example.com";
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
+    public void ClickViewVisualizations( ) throws ParseException {
+        ParseUser currentUser = ParseUser.getCurrentUser() ;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyData");
+        query.whereEqualTo("UserID", currentUser);
+        ParseObject result = query.getFirst();
+        String url = "http://emotion-maddula.rhcloud.com/Survey/"+result.getObjectId();
+        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(url));
         Context context = getContext();
         context.startActivity(intent);
     }
