@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+
+        body {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .x.axis path {
+            display: none;
+        }
+
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+        }
+
+        .legend rect {
+            fill:white;
+            stroke:black;
+            opacity:0.8;}
+
+    </style>
+
+    <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+    <script src="/javascripts/D3Legend.js"></script>
+    <script src="/javascripts/D3MultiLineChart.js"></script>
+
+    <script>
+
+        var urlarr = window.location.pathname.split("/");
+        var surveyid = urlarr[urlarr.length-1];
+
+        $(document).ready(function () {
+            console.log('data/SurveyData/' +  surveyid);
+            $.get('/data/SurveyData/' +  surveyid, function(data){
+                D3MultiLineChart(data);
+            });
+
+
+        });
+
+
+    </script>
+</head>
+<body>
+<h3> Visualizations of the survey </h3>
+
+<div id="chart">
+
+</div>
+</body>
+</html>
