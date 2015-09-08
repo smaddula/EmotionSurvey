@@ -12,9 +12,11 @@ public class UserQuestionData {
     public String QuestionObjectId;
     public Date questionStartTime;
     public Date questionEndTime;
+    public String imageURI;
     public List<TimeStampFrameInformationPair> frameData;
-    public UserQuestionData(String quetionid){
+    public UserQuestionData(String quetionid, String imageuri){
         QuestionObjectId = quetionid;
+        imageURI = imageuri;
         frameData = new ArrayList<TimeStampFrameInformationPair>();
     }
     public void AddFrameData( FrameInformation frameInformation) {

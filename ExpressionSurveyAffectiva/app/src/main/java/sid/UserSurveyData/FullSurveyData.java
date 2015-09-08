@@ -13,14 +13,16 @@ public class FullSurveyData {
     private transient Question currentQuestion;
     private transient UserQuestionData currentUserQuestionData;
     public void AddFrameData(Question question , FrameInformation frameInformation){
-        if( currentQuestion == null || question.parseQuestionData.getObjectId() != currentUserQuestionData.QuestionObjectId ){
-            currentQuestion = question;
-            if(currentUserQuestionData!=null)
-                currentUserQuestionData.FinishedQuestion();
-            currentUserQuestionData = new UserQuestionData(currentQuestion.parseQuestionData.getObjectId());
-            questionSurveyData.add(currentUserQuestionData);
+        if(question!=null) {
+            if (currentQuestion == null || question.parseQuestionData.getObjectId() != currentUserQuestionData.QuestionObjectId) {
+                currentQuestion = question;
+                if (currentUserQuestionData != null)
+                    currentUserQuestionData.FinishedQuestion();
+                currentUserQuestionData = new UserQuestionData(currentQuestion.parseQuestionData.getObjectId(), currentQuestion.ImageURI);
+                questionSurveyData.add(currentUserQuestionData);
+            }
+            currentUserQuestionData.AddFrameData(frameInformation);
         }
-        currentUserQuestionData.AddFrameData(frameInformation);
     }
     public FullSurveyData(){
         questionSurveyData = new ArrayList<UserQuestionData>();
