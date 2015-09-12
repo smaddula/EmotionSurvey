@@ -2,7 +2,7 @@
 
 *.iml
 *.license
-#/strings.xml
+app/src/main/res/values/strings.xml
 ## Directory-based project format:
 .idea/
 node_modules/
