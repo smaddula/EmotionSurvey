@@ -1,32 +1,59 @@
-function D3MultiLineChart (data) {
-    var margin = {top: 20, right: 80, bottom: 30, left: 50},
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+var margin = {top: 20, right: 80, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-    var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
+var x;
+var y;
+var data = [];
+var QuestionInfo = [];
 
-    var x = d3.time.scale()
+var svg;
+var line;
+var color;
+
+var xAxis;
+var yAxis;
+
+var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
+
+function D3MultiLineChart (RawData) {
+
+    RawData["questionSurveyData"].forEach(
+        function(r){
+            QuestionInfo.push( {
+                imageURI : r["imageURI"],
+                questionEndTime : r["questionEndTime"],
+                questionStartTime : r["questionStartTime"]
+            });
+
+            r["frameData"].forEach(function(s){
+                data.push(s);
+            });
+        }
+    );
+
+    x = d3.time.scale()
         .range([0, width]);
 
-    var y = d3.scale.linear()
+    y = d3.scale.linear()
         .range([height, 0]);
 
-    var color = d3.scale.category10();
+    color = d3.scale.category10();
 
-    var xAxis = d3.svg.axis()
+    xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom");
 
-    var yAxis = d3.svg.axis()
+    yAxis = d3.svg.axis()
         .scale(y)
         .orient("left");
 
-    var line = d3.svg.line()
+    line = d3.svg.line()
         .interpolate("basis")
         .x(function(d) { return x(d.time); })
         .y(function(d) { return y(d.emotionScore); });
 
-    var svg = d3.select("#chart").insert("svg",":first-child")
+    svg = d3.select("#chart").insert("svg",":first-child")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -56,7 +83,7 @@ function D3MultiLineChart (data) {
     ]);
 
     svg.append("g")
-        .attr("class", "x axis")
+        .attr("class", "xaxis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
 
@@ -68,7 +95,14 @@ function D3MultiLineChart (data) {
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Emotion Score (??F)");
+        .text("Emotion Score ");
+
+
+    svg.append("defs").append("clipPath")		//clippath to display only the correct size
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height);
 
     var city = svg.selectAll(".city")
         .data(cities)
@@ -76,28 +110,124 @@ function D3MultiLineChart (data) {
         .attr("class", "city");
 
     city.append("path")
+        .attr("clip-path", "url(#clip)")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
         .attr("data-legend",function(d) { return d.name})
         .style("stroke", function(d) { return color(d.name); });
 
-    /*city.append("text")
-     .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-     .attr("transform", function(d) { return "translate(" + x(d.value.time) + "," + y(d.value.emotionScore) + ")"; })
-     .attr("x", 3)
-     .attr("dy", ".35em")
-     .text(function(d) { return d.name; });*/
     legend = svg.append("g")
         .attr("class","legend")
         .attr("transform","translate(50,30)")
         .style("font-size","12px")
         .call(d3.legend);
 
-    /*                            setTimeout(function() {
-     legend
-     .style("font-size","20px")
-     .attr("data-style-padding",10)
-     .call(d3.legend)
-     },1000)
-     */
+    var infoSVGDivs = d3.select("body").append("ul")
+        .selectAll(".imagedivs").data(QuestionInfo)
+        .enter().append("li");
+
+    infoSVGDivs.append("img")
+        .attr("id",function(d,i){
+
+        })
+        .attr("src", function(d){
+            return d.imageURI;
+        })
+        .attr("width", function(d){
+            return width/QuestionInfo.length;
+        })
+        .attr("height", function(d){
+            //make height same as width so that we can have square spaces for images
+            return width/QuestionInfo.length;
+        })
+        .on("click",ClickedQuestionImage);
+
+};
+
+function ClickedQuestionImage (d){
+
+    resetAxisZoom();
+    var isSelected = d3.select(this).classed("selected");
+
+    d3.selectAll("img,.selected")
+        .attr({"width":width/QuestionInfo.length,"height":width/QuestionInfo.length});
+
+    d3.selectAll("img,.selected").classed("selected",false);
+
+
+    if(!isSelected){
+        d3.select(this)
+            .attr("width",(width/QuestionInfo.length)*1.5)
+            .attr("height",(width/QuestionInfo.length)*1.5);
+    }
+
+
+    d3.select(this).classed("selected",!isSelected);
+
+    if(!isSelected){
+        svg.append("rect")
+            .classed("BoundryLine",true)
+            .attr(
+            {
+                "x":x(parseDate(d.questionStartTime)),
+                "y":y(y.domain()[1]),
+                "width": function(b){
+                    if(d.questionEndTime)
+                    {
+                        return x(parseDate(d.questionEndTime))-x(parseDate(d.questionStartTime));
+                    }
+                    return x(x.domain()[1])-x(parseDate(d.questionStartTime));
+                },
+                "height":y(y.domain()[0])-y(y.domain()[1])
+            }
+        )
+            .attr("fill","black")
+            .attr("opacity",".5")
+            .on("click", BoundingBoxClicked);
+    }
+};
+
+function BoundingBoxClicked(d) {
+    var clickedBoundry = d3.select(this);
+    var isActiveAlready = d3.select(this).classed("active");
+
+    clickedBoundry.classed("active", true);
+    var boundryWidth = clickedBoundry.attr("width"),
+        boundryHeight = clickedBoundry.attr("height"),
+        boundaryX = clickedBoundry.attr("x"),
+        boundaryY = clickedBoundry.attr("y")
+
+    x.domain([x.invert(boundaryX),x.invert(parseFloat( boundaryX ) + parseFloat( boundryWidth ))])
+    d3.selectAll(".xaxis")
+        .transition().duration(1000).ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
+        .call(xAxis);
+
+    d3.selectAll(".line")
+        .transition()
+        .duration(1000)
+        .ease("linear")
+        .attr("d", function(d) { return line(d.values); })
+        .attr("data-legend",function(d) { return d.name})
+        .style("stroke", function(d) { return color(d.name); });
+
+
+    d3.selectAll(".BoundryLine").remove();
+
+};
+function resetAxisZoom() {
+    x.domain(d3.extent(data, function(d) { return d.time; }));
+    d3.selectAll(".xaxis")
+        .transition().duration(1500).ease("sin-in-out")
+        .call(xAxis);
+
+    d3.selectAll(".line")
+        .transition()
+        .duration(1500)
+        .ease("linear")
+        .attr("d", function(d) { return line(d.values); })
+        .attr("data-legend",function(d) { return d.name})
+        .style("stroke", function(d) { return color(d.name); });
+
+    d3.selectAll(".BoundryLine").remove();
+
 };

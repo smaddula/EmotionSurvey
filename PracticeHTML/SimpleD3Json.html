@@ -127,7 +127,9 @@ var color = d3.scale.category10();
 
 var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom");
+    .orient("bottom")
+	.ticks(10)
+	.tickFormat(d3.time.format("%H:%M:%S.%LZ"));;
 
 var yAxis = d3.svg.axis()
     .scale(y)
@@ -147,18 +149,19 @@ var svg = d3.select("body").append("svg")
 
 	var QuestionInfo = [];
 	var data = [];
-jsonEmotionData["questionSurveyData"].forEach( 
-	function(r){
-		QuestionInfo.push( {
-			imageURI : r["imageURI"],
-			questionEndTime : r["questionEndTime"],
-			questionStartTime : r["questionStartTime"]
-		});
-		r["frameData"].forEach(function(s){
-			data.push(s);
-		});
-	}
-);
+	jsonEmotionData["questionSurveyData"].forEach( 
+		function(r){
+			QuestionInfo.push( {
+				imageURI : r["imageURI"],
+				questionEndTime : r["questionEndTime"],
+				questionStartTime : r["questionStartTime"]
+			});
+		
+			r["frameData"].forEach(function(s){
+				data.push(s);
+			});
+		}
+	);
 
 color.domain(d3.keys(data[0].score));
 
@@ -186,7 +189,13 @@ color.domain(d3.keys(data[0].score));
       .attr("class", "xaxis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
-
+  svg.selectAll(".xaxis").selectAll(".tick")	  
+	  .selectAll("text")  
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)" );
+	  
   svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
@@ -196,14 +205,21 @@ color.domain(d3.keys(data[0].score));
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("Emotion Score ");
-	  AddLines();
-  function AddLines(){
+
+  
+  svg.append("defs").append("clipPath")		//clippath to display only the correct size 
+		.attr("id", "clip")
+		.append("rect")
+		.attr("width", width)
+		.attr("height", height);
+
   var city = svg.selectAll(".city")
       .data(cities)
     .enter().append("g")
       .attr("class", "city");
 
   city.append("path")
+	  .attr("clip-path", "url(#clip)")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
       .attr("data-legend",function(d) { return d.name})
@@ -215,7 +231,6 @@ color.domain(d3.keys(data[0].score));
     .attr("transform","translate(50,30)")
     .style("font-size","12px")
     .call(d3.legend);
-	}
 	
 	
 	var infoSVGDivs = d3.select("body").append("ul")
@@ -239,13 +254,13 @@ color.domain(d3.keys(data[0].score));
 	.on("click",function(d){
 		
 		
+		reset();
 		var isSelected = d3.select(this).classed("selected");
 		
 		infoSVGDivs.selectAll("img,.selected")
 		.attr({"width":width/QuestionInfo.length,"height":width/QuestionInfo.length});
 		
 		infoSVGDivs.selectAll("img").classed("selected",false);
-		
 		
 		
 		if(!isSelected){
@@ -257,28 +272,27 @@ color.domain(d3.keys(data[0].score));
 		
 		d3.select(this).classed("selected",!isSelected);
 		
-		d3.selectAll(".BoundryLine").remove();
-		
-		svg.append("rect")
-		.classed("BoundryLine",true)
-		.attr(
-			{
-			"x":x(parseDate(d.questionStartTime)),
-			"y":y(y.domain()[1]),
-			"width": function(b){ 
-					if(d.questionEndTime)
-					{
-						return x(parseDate(d.questionEndTime))-x(parseDate(d.questionStartTime));
-					}
-					return x(x.domain()[1])-x(parseDate(d.questionStartTime));
-				},
-			"height":y(y.domain()[0])-y(y.domain()[1])
-			}
-		)
-		.attr("fill","black")
-		.attr("opacity",".5")
-		.on("click", clicked);
-		
+		if(!isSelected){
+			svg.append("rect")
+			.classed("BoundryLine",true)
+			.attr(
+				{
+				"x":x(parseDate(d.questionStartTime)),
+				"y":y(y.domain()[1]),
+				"width": function(b){ 
+						if(d.questionEndTime)
+						{
+							return x(parseDate(d.questionEndTime))-x(parseDate(d.questionStartTime));
+						}
+						return x(x.domain()[1])-x(parseDate(d.questionStartTime));
+					},
+				"height":y(y.domain()[0])-y(y.domain()[1])
+				}
+			)
+			.attr("fill","black")
+			.attr("opacity",".5")
+			.on("click", clicked);
+		}
 		});
 	function clicked(d) {
 		var clickedBoundry = d3.select(this);
@@ -290,7 +304,7 @@ color.domain(d3.keys(data[0].score));
 		 boundaryX = clickedBoundry.attr("x"),
 		 boundaryY = clickedBoundry.attr("y")
 		 
-		 x.domain([x.invert(boundaryX),x.invert(parseFloat( boundaryX ) + parseFloat( boundryWidth ))])  // change scale to 0, to between 10 and 100
+		 x.domain([x.invert(boundaryX),x.invert(parseFloat( boundaryX ) + parseFloat( boundryWidth ))])  
             svg.select(".xaxis")
                     .transition().duration(1500).ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
                     .call(xAxis);
@@ -303,22 +317,26 @@ color.domain(d3.keys(data[0].score));
 		.attr("data-legend",function(d) { return d.name})
 		.style("stroke", function(d) { return color(d.name); });		
 		
-		/*d3.selectAll("rect")
-		.classed("BoundryLine",false)
-		.attr(
-			{
-			"x":x(x.domain()[0]),
-			"y":y(y.domain()[1]),
-			"width": function(b){ 
-					x(x.domain()[1])-x(x.domain()[0])
-				},
-			"height":y(y.domain()[0])-y(y.domain()[1])
-			}
-		)
-		.attr("fill","black")
-		.attr("opacity",".5")
-		.on("click", clicked);
-		*/
+		
+		d3.selectAll(".BoundryLine").remove();
+		
+	}
+	function reset() {
+		x.domain(d3.extent(data, function(d) { return d.time; }));
+        svg.select(".xaxis")
+            .transition().duration(1500).ease("sin-in-out")  
+            .call(xAxis);
+
+		d3.selectAll(".line")
+		.transition()
+		.duration(1500)
+		.ease("linear")
+		.attr("d", function(d) { return line(d.values); })
+		.attr("data-legend",function(d) { return d.name})
+		.style("stroke", function(d) { return color(d.name); });		
+		
+		d3.selectAll(".BoundryLine").remove();
+		
 		
 	}
   setTimeout(function() { 
