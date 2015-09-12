@@ -3,6 +3,13 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        article, aside, figure, footer, header,
+        menu, nav, section { display: block; }
+        ul { list-style: none; }
+        ul li { display: inline; }
+        ul li img { border: 2px solid white; cursor: pointer; }
+        ul li img:hover { border: 2px solid red; }
+        ul li img.selected { border: 2px solid black; }
 
         body {
             font: 10px sans-serif;
@@ -30,7 +37,10 @@
             stroke:black;
             opacity:0.8;}
 
+
+
     </style>
+
 
     <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
