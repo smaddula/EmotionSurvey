@@ -209,13 +209,7 @@ color.domain(d3.keys(data[0].score));
       .attr("data-legend",function(d) { return d.name})
       .style("stroke", function(d) { return color(d.name); });
 
-  city.append("text")
-      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.time) + "," + y(d.value.emotionScore) + ")"; })
-      .attr("x", 3)
-      .attr("dy", ".35em")
-      .text(function(d) { return d.name; });
-
+  
    legend = svg.append("g")
     .attr("class","legend")
     .attr("transform","translate(50,30)")
@@ -287,11 +281,9 @@ color.domain(d3.keys(data[0].score));
 		
 		});
 	function clicked(d) {
-		d3.selectAll(".city").remove();
-		d3.selectAll(".legend").remove();
 		var clickedBoundry = d3.select(this);
 		var isActiveAlready = d3.select(this).classed("active");
-		//if (isActiveAlready) return reset();
+		
 		clickedBoundry.classed("active", true);
 		var boundryWidth = clickedBoundry.attr("width"),
 		 boundryHeight = clickedBoundry.attr("height"),
@@ -302,8 +294,32 @@ color.domain(d3.keys(data[0].score));
             svg.select(".xaxis")
                     .transition().duration(1500).ease("sin-in-out")  // https://github.com/mbostock/d3/wiki/Transitions#wiki-d3_ease
                     .call(xAxis);
-			//svg.redraw();
-		AddLines();
+
+		d3.selectAll(".line")
+		.transition()
+		.duration(1500)
+		.ease("linear")
+		.attr("d", function(d) { return line(d.values); })
+		.attr("data-legend",function(d) { return d.name})
+		.style("stroke", function(d) { return color(d.name); });		
+		
+		/*d3.selectAll("rect")
+		.classed("BoundryLine",false)
+		.attr(
+			{
+			"x":x(x.domain()[0]),
+			"y":y(y.domain()[1]),
+			"width": function(b){ 
+					x(x.domain()[1])-x(x.domain()[0])
+				},
+			"height":y(y.domain()[0])-y(y.domain()[1])
+			}
+		)
+		.attr("fill","black")
+		.attr("opacity",".5")
+		.on("click", clicked);
+		*/
+		
 	}
   setTimeout(function() { 
     legend
