@@ -110,14 +110,6 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Enable Local Datastore.
-/*        Parse.enableLocalDatastore(this);
-
-        Parse.initialize(this, "DYlc2hnyF3zlDZNcxhDE2zgSk87eQOdRCOJhgVSQ", "C5AaStSC1L4qx8S6rV2QnGGh3SgyphIKc2L6hiYe");
-
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-*/
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -126,15 +118,6 @@ public class MainActivity extends Activity
 
         segmentId = 0 ;
         FolderPath = getExternalFilesDir(null) + File.separator + APP_UUID;
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-/*        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);*/
-
-
 
         cameraPreview = (SurfaceView) findViewById(R.id.cameraId);
         // Put the SDK in camera mode by using this constructor. The SDK will be in control of
@@ -198,17 +181,7 @@ public class MainActivity extends Activity
     }
 
     public void SaveData(View view) throws IOException, com.parse.ParseException {
-        //File directory = new File(FolderPath);
-        //directory.mkdir();
-        //File file = new File(FolderPath, "Scores.txt");
-        //FileOutputStream os = new FileOutputStream(file);
-        //String Header = "date\tsmile\tbrowfurrow\tbrowrise\tvalence\tengagement\tlipcornerdepressor";
-        //OutputStreamWriter out = new OutputStreamWriter(os);
-        //out.write(Header + "\n");
-        //for(TimeStampFrameInformationPair smileTimeScore: framesScore){
-        //    out.write(smileTimeScore.getLine() + "\n");
-        //}
-        //out.close();
+
         String result = gson.toJson(userData);
         ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
         emotionFrameData.save();
@@ -224,7 +197,7 @@ public class MainActivity extends Activity
         if(allQuestions.size()==0)
             return;
         currentQuestion = allQuestions.get( segmentId );
-        ImageView imageView = ((ImageView) findViewById(R.id.image));//.setImageURI(Uri.parse(getArguments().getString(ARG_IMAGE_SOURCE)));
+        ImageView imageView = ((ImageView) findViewById(R.id.image));
         new DownloadImageTask(imageView)
                 .execute(currentQuestion.ImageURI);
         ((TextView)findViewById(R.id.text_view)).setText( currentQuestion.QuestionHeading);
@@ -261,90 +234,5 @@ public class MainActivity extends Activity
 
         return super.onOptionsItemSelected(item);
     }
-
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    /*public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            Locale l = Locale.getDefault();
-            switch (position) {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
-                case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
-            }
-            return null;
-        }
-    }*/
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    /*public static class PlaceholderFragment extends Fragment {
-        *//**
-         * The fragment argument representing the section number for this
-         * fragment.
-         *//*
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        private static String ARG_IMAGE_SOURCE ;
-        *//**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         *//*
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            if(sectionNumber == 1)
-            {
-                args.putString(ARG_IMAGE_SOURCE, "http://www.google.com/images/srpr/logo11w.png");
-            }else
-            {
-                args.putString(ARG_IMAGE_SOURCE, "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lynn_-_detail_first_state_1987.jpg");
-            }
-            fragment.setArguments(args);
-            return fragment;
-        }
-        //Use bundle instead
-        public PlaceholderFragment() {
-
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            int sectionNumber =  getArguments().getInt(ARG_SECTION_NUMBER);
-            ((TextView) rootView.findViewById(R.id.text_view)).setText("hey Bro .. " + sectionNumber);
-            ImageView imageView = ((ImageView) rootView.findViewById(R.id.image));//.setImageURI(Uri.parse(getArguments().getString(ARG_IMAGE_SOURCE)));
-            new DownloadImageTask(imageView)
-                    .execute(getArguments().getString(ARG_IMAGE_SOURCE));
-            return rootView;
-        }
-    }*/
 
 }
