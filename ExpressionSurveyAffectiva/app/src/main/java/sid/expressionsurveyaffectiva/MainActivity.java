@@ -205,10 +205,12 @@ public class MainActivity extends Activity
         if(segmentId == allQuestions.size() - 1)
         {
             ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
+            ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
             segmentId = 0;
         } else
         {
-            ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.INVISIBLE);
+            ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
+            ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
             segmentId++;
         }
     }

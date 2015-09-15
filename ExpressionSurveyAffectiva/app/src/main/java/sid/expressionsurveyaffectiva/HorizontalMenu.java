@@ -49,6 +49,7 @@ public class HorizontalMenu extends LinearLayout {
         ParseUser currentUser = ParseUser.getCurrentUser() ;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyData");
         query.whereEqualTo("UserID", currentUser);
+        query.orderByDescending("createdAt");
         ParseObject result = query.getFirst();
         String url = "http://emotion-maddula.rhcloud.com/survey/"+result.getObjectId();
         Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(url));
