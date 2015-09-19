@@ -48,7 +48,7 @@ public class MainActivity extends Activity
     static String FolderPath;
     FullSurveyData userData = new FullSurveyData();
     List<Question> allQuestions = new ArrayList<Question>();
-    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion;
 
     /**
@@ -102,8 +102,7 @@ public class MainActivity extends Activity
         }
 
         Face face = faces.get(0);
-        userData.AddFrameData(currentQuestion, new FrameInformation(face.expressions.getSmile(), face.expressions.getBrowFurrow(),
-                face.expressions.getBrowRaise(), face.emotions.getValence(), face.emotions.getEngagement(), face.expressions.getLipCornerDepressor()));
+        userData.AddFrameData(currentQuestion, new FrameInformation( face ));
     }
 
     @Override
@@ -127,19 +126,14 @@ public class MainActivity extends Activity
         // NOTE: replace "Affectiva.license" with your license file, which should be stored in /assets/Affdex/
         detector.setLicensePath("sdk_kusuma.chunduru@gmail.com.license");
 
-        // We want to detect all expressions, so turn on all classifiers.
-        detector.setDetectSmile(true);
-        detector.setDetectLipCornerDepressor(true);
-        detector.setDetectBrowFurrow(true);
-        detector.setDetectBrowRaise(true);
-        detector.setDetectEngagement(true);
-        detector.setDetectValence(true);
-
         detector.setMaxProcessRate(20);
 
         detector.setImageListener(this);
         detector.setFaceListener(this);
-        //detector.setCameraDetectorDimensionsListener(this);
+
+        detector.setDetectAllEmotions(true);
+        detector.setDetectAllExpressions(true);
+
         detector.start();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Question");

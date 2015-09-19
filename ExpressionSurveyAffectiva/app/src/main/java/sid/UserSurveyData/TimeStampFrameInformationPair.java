@@ -1,5 +1,7 @@
 package sid.UserSurveyData;
 
+import com.affectiva.android.affdex.sdk.detector.Face;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,13 +16,9 @@ public class TimeStampFrameInformationPair {
         datetime = param_date;
         score = value;
     }
-    TimeStampFrameInformationPair(Date param_date, float smile, float browfurrow, float browrise, float valience, float engagement, float lipcornerdepressor) {
+    TimeStampFrameInformationPair(Date param_date, Face face) {
         datetime = param_date;
-        score = new FrameInformation(smile , browfurrow , browrise , valience , engagement , lipcornerdepressor);
+        score = new FrameInformation(face);
     }
-    
-    public String getLine()
-    {
-        return formatter.format(datetime) + "\t" + score.getLine() ;
-    }
+
 }
