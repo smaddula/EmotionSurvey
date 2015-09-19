@@ -102,9 +102,8 @@ public class MainActivity extends Activity
         }
 
         Face face = faces.get(0);
-        userData.AddFrameData(currentQuestion, new FrameInformation(face.getSmileScore(), face.getBrowFurrowScore(),
-                face.getBrowRaiseScore(), face.getValenceScore(), face.getEngagementScore(), face.getLipCornerDepressorScore()));
-
+        userData.AddFrameData(currentQuestion, new FrameInformation(face.expressions.getSmile(), face.expressions.getBrowFurrow(),
+                face.expressions.getBrowRaise(), face.emotions.getValence(), face.emotions.getEngagement(), face.expressions.getLipCornerDepressor()));
     }
 
     @Override
@@ -140,7 +139,7 @@ public class MainActivity extends Activity
 
         detector.setImageListener(this);
         detector.setFaceListener(this);
-
+        //detector.setCameraDetectorDimensionsListener(this);
         detector.start();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Question");
