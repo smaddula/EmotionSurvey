@@ -18,6 +18,8 @@ var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 
 function D3MultiLineChart (RawData) {
 
+    QuestionInfo.length = 0
+    data.length = 0
     RawData["questionSurveyData"].forEach(
         function(r){
             QuestionInfo.push( {
@@ -27,7 +29,18 @@ function D3MultiLineChart (RawData) {
             });
 
             r["frameData"].forEach(function(s){
-                data.push(s);
+
+                var obj = {};
+                obj["datetime"] = s["datetime"];
+                var scoreObject = {};
+                for(property in s["score"]["frameEmotionInfo"]){
+                    scoreObject[property] = s["score"]["frameEmotionInfo"][property];
+                }
+                for(property in s["score"]["frameExpressionInfo"]){
+                    scoreObject[property] = s["score"]["frameExpressionInfo"][property];
+                }
+                obj["score"] = scoreObject;
+                data.push(obj);
             });
         }
     );
@@ -113,16 +126,24 @@ function D3MultiLineChart (RawData) {
         .attr("clip-path", "url(#clip)")
         .attr("class", "line")
         .attr("d", function(d) { return line(d.values); })
-        .attr("data-legend",function(d) { return d.name})
-        .style("stroke", function(d) { return color(d.name); });
+        .attr("id",function(d) { return d.name})
+        .style("stroke", function(d) { return color(d.name); })
+        .style("opacity",0);
 
-    legend = svg.append("g")
-        .attr("class","legend")
-        .attr("transform","translate(50,30)")
-        .style("font-size","12px")
-        .call(d3.legend);
+    var allEmotions = d3.select("#jsonDataDisplay").append("div")
+        .attr("class","container-fluid row")
+        .selectAll(".emotionConfigurations").data(color.domain())
+        .enter().append("div").attr("class","col-xs-4 col-sm-2 col-md-2");
 
-    var infoSVGDivs = d3.select("body").append("ul")
+    allEmotions.append("span").style("cursor","pointer")
+        .style("color",function(v){return color(v);})
+        .text(function(v){return v;})
+        .style("font-weight","bold");
+
+    allEmotions.append("input").attr("type","checkbox").on("change",function(){
+        d3.selectAll("#"+this.__data__).style("opacity",this.checked?1:0);});
+
+    var infoSVGDivs = d3.select("#jsonDataDisplay").append("ul")
         .selectAll(".imagedivs").data(QuestionInfo)
         .enter().append("li");
 
@@ -207,9 +228,6 @@ function BoundingBoxClicked(d) {
         .duration(1000)
         .ease("linear")
         .attr("d", function(d) { return line(d.values); })
-        .attr("data-legend",function(d) { return d.name})
-        .style("stroke", function(d) { return color(d.name); });
-
 
     d3.selectAll(".BoundryLine").remove();
 
@@ -225,8 +243,6 @@ function resetAxisZoom() {
         .duration(1500)
         .ease("linear")
         .attr("d", function(d) { return line(d.values); })
-        .attr("data-legend",function(d) { return d.name})
-        .style("stroke", function(d) { return color(d.name); });
 
     d3.selectAll(".BoundryLine").remove();
 
