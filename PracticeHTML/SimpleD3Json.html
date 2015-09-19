@@ -44,68 +44,16 @@ body {
 
   
 </style>
-<body>
+<head>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+</head>
+<body>
 <script>
-//https://www.safaribooksonline.com/blog/2014/03/11/solving-d3-label-placement-constraint-relaxing/
-//http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
-//http://www.d3noob.org/2014/05/including-html-link-in-d3js-tool-tip.html
-//http://stackoverflow.com/questions/13201749/draw-simple-timeline-with-d3
-//http://jsfiddle.net/ee2todev/6u0a0qnw/
-//https://github.com/alangrafu/timeknots
-(function() {
-d3.legend = function(g) {
-  g.each(function() {
-    var g= d3.select(this),
-        items = {},
-        svg = d3.select(g.property("nearestViewportElement")),
-        legendPadding = g.attr("data-style-padding") || 5,
-        lb = g.selectAll(".legend-box").data([true]),
-        li = g.selectAll(".legend-items").data([true])
-
-    lb.enter().append("rect").classed("legend-box",true)
-    li.enter().append("g").classed("legend-items",true)
-
-    svg.selectAll("[data-legend]").each(function() {
-        var self = d3.select(this)
-        items[self.attr("data-legend")] = {
-          pos : self.attr("data-legend-pos") || this.getBBox().y,
-          color : self.attr("data-legend-color") != undefined ? self.attr("data-legend-color") : self.style("fill") != 'none' ? self.style("fill") : self.style("stroke") 
-        }
-      })
-
-    items = d3.entries(items).sort(function(a,b) { return a.value.pos-b.value.pos})
-
-    
-    li.selectAll("text")
-        .data(items,function(d) { return d.key})
-        .call(function(d) { d.enter().append("text")})
-        .call(function(d) { d.exit().remove()})
-        .attr("y",function(d,i) { return i+"em"})
-        .attr("x","1em")
-        .text(function(d) { ;return d.key})
-    
-    li.selectAll("circle")
-        .data(items,function(d) { return d.key})
-        .call(function(d) { d.enter().append("circle")})
-        .call(function(d) { d.exit().remove()})
-        .attr("cy",function(d,i) { return i-0.25+"em"})
-        .attr("cx",0)
-        .attr("r","0.4em")
-        .style("fill",function(d) { console.log(d.value.color);return d.value.color})  
-    
-    // Reposition and resize the box
-    var lbbox = li[0][0].getBBox()  
-    lb.attr("x",(lbbox.x-legendPadding))
-        .attr("y",(lbbox.y-legendPadding))
-        .attr("height",(lbbox.height+2*legendPadding))
-        .attr("width",(lbbox.width+2*legendPadding))
-  })
-  return g
-}
-})()
 
 
 
@@ -129,7 +77,7 @@ var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom")
 	.ticks(10)
-	.tickFormat(d3.time.format("%H:%M:%S.%LZ"));;
+	.tickFormat(d3.time.format("%M:%S.%LZ"));;
 
 var yAxis = d3.svg.axis()
     .scale(y)
@@ -186,7 +134,7 @@ color.domain(d3.keys(data[0].score));
   ]);
 
   svg.append("g")
-      .attr("class", "xaxis")
+      .attr("class", "xaxis axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
   svg.selectAll(".xaxis").selectAll(".tick")	  
@@ -194,7 +142,7 @@ color.domain(d3.keys(data[0].score));
       .style("text-anchor", "end")
       .attr("dx", "-.8em")
       .attr("dy", ".15em")
-      .attr("transform", "rotate(-65)" );
+    //  .attr("transform", "rotate(-65)" );
 	  
   svg.append("g")
       .attr("class", "y axis")
@@ -222,8 +170,9 @@ color.domain(d3.keys(data[0].score));
 	  .attr("clip-path", "url(#clip)")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
-      .attr("data-legend",function(d) { return d.name})
-      .style("stroke", function(d) { return color(d.name); });
+      .attr("id",function(d) { return d.name})
+      .style("stroke", function(d) { return color(d.name); })
+	  .style("opacity",0);
 
   
    legend = svg.append("g")
@@ -233,14 +182,28 @@ color.domain(d3.keys(data[0].score));
     .call(d3.legend);
 	
 	
+	var allEmotions = d3.select("body").append("div")
+						.attr("class","container-fluid row")
+						.selectAll(".emotionConfigurations").data(color.domain())
+						.enter().append("div").attr("class","col-sm-3");
+						
+						allEmotions.append("span").style("cursor","pointer")
+						.style("color",function(v){return color(v);})
+						.text(function(v){return v;})
+						
+						allEmotions.append("input").attr("type","checkbox").on("change",function(){
+						
+							d3.selectAll("#"+this.__data__).style("opacity",this.checked?1:0);
+							//var selected = this.__data__;
+							
+						})
+						
+	
 	var infoSVGDivs = d3.select("body").append("ul")
 				.selectAll(".imagedivs").data(QuestionInfo)
                 .enter().append("li");
 		
 	infoSVGDivs.append("img")
-	.attr("id",function(d,i){
-		
-	})
     .attr("src", function(d){
 		return d.imageURI;
 	})
