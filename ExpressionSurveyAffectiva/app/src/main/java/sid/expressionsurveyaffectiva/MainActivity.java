@@ -20,6 +20,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 
@@ -50,20 +52,7 @@ public class MainActivity extends Activity
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion;
-
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    //SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    RadioGroup valenceRadioGroup ;
 
     ViewPager mViewPager;
 
@@ -80,7 +69,6 @@ public class MainActivity extends Activity
     public void onFaceDetectionStopped() {
         return;
     }
-
 
     @Override
     public void onImageResults(List<Face> faces, Frame image, float timeStamp) {
@@ -113,6 +101,8 @@ public class MainActivity extends Activity
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
 
         segmentId = 0 ;
         FolderPath = getExternalFilesDir(null) + File.separator + APP_UUID;
@@ -154,9 +144,19 @@ public class MainActivity extends Activity
 
     }
 
-    public void loadData( View view ){
+    public void FinishServingQuestion(){
+        RadioButton rb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
+        userData.setUserInput(Integer.parseInt(rb.getTag().toString()));
+        valenceRadioGroup.clearCheck();
+    }
+
+    public void loadNextQuestion( View view ){
+        if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
+            return;
+        FinishServingQuestion();
         loadData();
     }
+
     public void logout( View view ){
         ParseUser.logOut();
 
@@ -174,7 +174,7 @@ public class MainActivity extends Activity
     }
 
     public void SaveData(View view) throws IOException, com.parse.ParseException {
-
+        FinishServingQuestion();
         String result = gson.toJson(userData);
         ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
         emotionFrameData.save();
@@ -226,8 +226,6 @@ public class MainActivity extends Activity
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
 }

@@ -24,6 +24,11 @@ public class FullSurveyData {
             currentUserQuestionData.AddFrameData(frameInformation);
         }
     }
+
+    public void setUserInput(int valenceUserInput){
+        currentUserQuestionData.valenceUserInput = valenceUserInput;
+    }
+
     public FullSurveyData(){
         questionSurveyData = new ArrayList<UserQuestionData>();
         currentQuestion = null;

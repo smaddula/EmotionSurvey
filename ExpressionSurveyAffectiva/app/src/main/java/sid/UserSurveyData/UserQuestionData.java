@@ -13,6 +13,7 @@ public class UserQuestionData {
     public Date questionStartTime;
     public Date questionEndTime;
     public String imageURI;
+    public int valenceUserInput;
     public List<TimeStampFrameInformationPair> frameData;
     public UserQuestionData(String quetionid, String imageuri){
         QuestionObjectId = quetionid;

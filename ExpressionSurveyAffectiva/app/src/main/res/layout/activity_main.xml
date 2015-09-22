@@ -46,26 +46,22 @@
             tools:context=".GridLayoutActivity" >
 
             <LinearLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/button3"
-                    android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:text="Happy" />
-
-                <Button
-                    android:id="@+id/button1"
-                    android:gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Sad" />
+                <RadioGroup android:id="@+id/valenceRadioGroup" android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_happiest" android:tag="5"
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlehappy" android:tag="4"
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_neutral" android:tag="3"
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlesad" android:tag="2"
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_verysad" android:tag="1"
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                </RadioGroup>
 
             </LinearLayout>
 
@@ -115,7 +111,7 @@
                 android:layout_centerVertical="true"
                 android:text="Next"
                 android:layout_weight="1"
-                android:onClick="loadData" />
+                android:onClick="loadNextQuestion" />
             <Button
                 android:id="@+id/lastQuestionSave"
                 android:layout_width="0dp"
