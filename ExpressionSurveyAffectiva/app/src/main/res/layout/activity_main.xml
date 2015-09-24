@@ -8,14 +8,12 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical" >
-
-        <!--<include layout="@layout/horizontalmenu" />-->
-
+<!--
         <sid.expressionsurveyaffectiva.HorizontalMenu
             android:layout_width="fill_parent"
             android:layout_gravity="center_horizontal|center_vertical"
             android:gravity="center_horizontal|center_vertical"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"/>-->
 
         <TextView
             android:id="@+id/text_view"

@@ -113,7 +113,6 @@ public class MainActivity extends Activity
         // that view will be painted with what the camera sees.
         detector = new CameraDetector(this, CameraDetector.CameraType.CAMERA_FRONT, cameraPreview);
 
-        // NOTE: replace "Affectiva.license" with your license file, which should be stored in /assets/Affdex/
         detector.setLicensePath("sdk_kusuma.chunduru@gmail.com.license");
 
         detector.setMaxProcessRate(20);
@@ -157,20 +156,9 @@ public class MainActivity extends Activity
         loadData();
     }
 
-    public void logout( View view ){
-        ParseUser.logOut();
-
-        // FLAG_ACTIVITY_CLEAR_TASK only works on API 11, so if the user
-        // logs out on older devices, we'll just exit.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            Intent intent = new Intent(MainActivity.this,
-                    MainDispatchActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        } else {
-            finish();
-        }
+    @Override
+    public void onBackPressed(){
+        //Dont want to do anything when back is pressed
     }
 
     public void SaveData(View view) throws IOException, com.parse.ParseException {
@@ -183,6 +171,10 @@ public class MainActivity extends Activity
         userSurvey.put("UserID",ParseUser.getCurrentUser());
         userSurvey.put("JsonEmotionData",emotionFrameData);
         userSurvey.save();
+        Intent intent = new Intent(MainActivity.this,
+                UserPickActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public void loadData(  )
@@ -206,26 +198,5 @@ public class MainActivity extends Activity
             ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
             segmentId++;
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

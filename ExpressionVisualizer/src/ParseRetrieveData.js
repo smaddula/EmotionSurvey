@@ -38,12 +38,13 @@ module.exports =
         var surveyedData = Parse.Object.extend("SurveyData");
         var query = new Parse.Query(surveyedData);
         query.equalTo("UserID", selecteduser);
+        query.ascending("createdAt");
         var rtn = [];
 
         return query.find().then(function (res) {
                 res.forEach(function (value, index, ar) {
                     console.log(value.createdAt);
-                    rtn.push({createdat: value.createdAt, objectId: value.id});
+                    rtn.push({createdat: value.createdAt , objectId: value.id});
                 });
                 return rtn;
             },

@@ -17,6 +17,7 @@ public class FrameExpressionInfo {
     float InnerBrowRaise;
     float LipPress;
     float LipPucker;
+    float LipSuck;
     float MouthOpen;
     float NoseWrinkle;
     float Smirk;
@@ -39,7 +40,7 @@ public class FrameExpressionInfo {
         NoseWrinkle = face.expressions.getNoseWrinkle();
         Smirk = face.expressions.getSmirk();
         UpperLipRaise = face.expressions.getUpperLipRaise();
-
+        LipSuck = face.expressions.getLipSuck();
     }
 
 }

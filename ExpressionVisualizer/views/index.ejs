@@ -72,7 +72,7 @@
                             $.each(data, function (i, item) {
                                 $('#selectSurvey').append($('<option>', {
                                     value: item.objectId,
-                                    text: item.createdat
+                                    text: new Date(item.createdat)
                                 }));
                             });
                         });
