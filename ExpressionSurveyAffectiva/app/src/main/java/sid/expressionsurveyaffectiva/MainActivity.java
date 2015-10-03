@@ -1,14 +1,25 @@
 package sid.expressionsurveyaffectiva;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -20,6 +31,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -45,14 +57,16 @@ import sid.UserSurveyData.TimeStampFrameInformationPair;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
-    static int segmentId;
-    static String APP_UUID = UUID.randomUUID().toString();
-    static String FolderPath;
+    int segmentId;
+    String APP_UUID = UUID.randomUUID().toString();
+    String FolderPath;
+    boolean savedImage = false;
     FullSurveyData userData = new FullSurveyData();
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion;
     RadioGroup valenceRadioGroup ;
+    LinearLayout surfaceViewContainer , footerButtonsContainer;
 
     ViewPager mViewPager;
 
@@ -62,11 +76,18 @@ public class MainActivity extends Activity
 
     @Override
     public void onFaceDetectionStarted() {
-
+        if(surfaceViewContainer!=null && footerButtonsContainer!=null){
+            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(50,50));
+            footerButtonsContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onFaceDetectionStopped() {
+        if(surfaceViewContainer!=null && footerButtonsContainer!=null){
+            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+            footerButtonsContainer.setVisibility(View.GONE);
+        }
         return;
     }
 
@@ -80,17 +101,51 @@ public class MainActivity extends Activity
             //Log.v(LOG_TAG, "No face found");
             return;
         }
-        int width = image.getWidth();
-        int height = image.getHeight();
-        // If rotated by 90, then facial feature points are in a different coordinate space.
-        // Width swapped with height from original image.
-        if ((ROTATE.BY_90_CW == image.getTargetRotation()) || (ROTATE.BY_90_CCW == image.getTargetRotation())) {
-            height = image.getWidth();
-            width = image.getHeight();
+        savedImage = false;
+        if (!savedImage) {
+            try {
+
+                int width = image.getWidth();
+                int height = image.getHeight();
+
+                String path = Environment.getExternalStorageDirectory().toString();
+                OutputStream fOut = null;
+                File file = new File(path, "FitnessGirl.jpg"); // the File to save to
+                fOut = new FileOutputStream(file);
+                YuvImage img = new YuvImage(
+                        ((Frame.ByteArrayFrame) image).getByteArray(), ImageFormat.NV21 , width,height,null);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                img.compressToJpeg(new Rect(0,0,width,height),100,out);
+                byte[] imageBytes = out.toByteArray();
+                Bitmap image1 = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                switch (image.getTargetRotation()) {
+                    case BY_90_CCW:
+                        image1 = Frame.rotateImage(image1,-90);
+                        break;
+                    case BY_90_CW:
+                        image1 = Frame.rotateImage(image1,90);
+                        break;
+                    case BY_180:
+                        image1 = Frame.rotateImage(image1,180);
+                        break;
+                    default:
+                        //keep bitmap as it is
+                }
+
+                image1.compress(Bitmap.CompressFormat.JPEG,100,fOut);
+
+                fOut.flush();
+                fOut.close();
+                savedImage=true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         Face face = faces.get(0);
         userData.AddFrameData(currentQuestion, new FrameInformation( face ));
+
     }
 
     @Override
@@ -101,6 +156,9 @@ public class MainActivity extends Activity
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
+        footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
+
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
 
@@ -111,6 +169,7 @@ public class MainActivity extends Activity
         // Put the SDK in camera mode by using this constructor. The SDK will be in control of
         // the camera. If a SurfaceView is passed in as the last argument to the constructor,
         // that view will be painted with what the camera sees.
+
         detector = new CameraDetector(this, CameraDetector.CameraType.CAMERA_FRONT, cameraPreview);
 
         detector.setLicensePath("sdk_kusuma.chunduru@gmail.com.license");
