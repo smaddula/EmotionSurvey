@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -35,6 +36,11 @@ import com.affectiva.android.affdex.sdk.Frame;
 import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
+import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.parse.FindCallback;
@@ -49,15 +55,18 @@ import sid.UserSurveyData.FullSurveyData;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
+    ArrayList <TransferObserver> transferObservers;
     int questionIterator;
-    String surveyImagesDeviceDirectory = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss'.tsv'").format(new Date());
+    int numberOfFilesUploaded;
+    String surveyImagesDeviceDirectory = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
     boolean saveImage = true;
     FullSurveyData userData = new FullSurveyData();
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion;
     RadioGroup valenceRadioGroup ;
-    LinearLayout surfaceViewContainer , footerButtonsContainer;
+    LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer;
+    ProgressBar uploadProgressBar;
 
     private SurfaceView cameraPreview;
     private CameraDetector detector;
@@ -66,7 +75,7 @@ public class MainActivity extends Activity
     @Override
     public void onFaceDetectionStarted() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
-            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(50,50));
+            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
             footerButtonsContainer.setVisibility(View.VISIBLE);
         }
     }
@@ -74,8 +83,8 @@ public class MainActivity extends Activity
     @Override
     public void onFaceDetectionStopped() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
-            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
             footerButtonsContainer.setVisibility(View.GONE);
+            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
         return;
     }
@@ -100,11 +109,11 @@ public class MainActivity extends Activity
                 int width = image.getWidth();
                 int height = image.getHeight();
 
-                String path = Environment.getExternalStorageDirectory().toString();
-                OutputStream fOut = null;
                 // Naming the file randomly
-                File file = new File(surveyImagesDeviceDirectory+ "/" + UserFaceImageName);
-                fOut = new FileOutputStream(file);
+                //String dirPath =  ;//+ File.separator +  surveyImagesDeviceDirectory;
+                File file = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator+ surveyImagesDeviceDirectory+ File.separator + UserFaceImageName);
+                file.getParentFile().mkdirs();
+                OutputStream fOut = new FileOutputStream(file);
                 //TODO: Save file as Yuv instead of bitmap and converting to jpg
                 //investigate how to rotate a Yuv image to make this optimization
                 YuvImage img = new YuvImage(
@@ -132,7 +141,6 @@ public class MainActivity extends Activity
 
                 fOut.flush();
                 fOut.close();
-                saveImage=true;
             } catch (IOException e) {
                 UserFaceImageName = "";
                 e.printStackTrace();
@@ -147,12 +155,53 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         // Enable Local Datastore.
 
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
+        uploadProgressBarContainer = (LinearLayout)findViewById(R.id.layoutUploadProgress);
+        uploadProgressBar = (ProgressBar)findViewById(R.id.uploadProgressBar);
+
+
+        TransferUtility transferUtility;
+        transferUtility = Util.getTransferUtility(this);
+        File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ "F4m7fSDig0");
+        //uploading the images folder to s3
+        transferObservers = new ArrayList<TransferObserver>();
+        TransferObserver transferObserver;
+
+        numberOfFilesUploaded = 0;
+        uploadProgressBar.setMax(newName.listFiles().length);
+        for (File file:newName.listFiles()) {
+            transferObserver= transferUtility.upload(Util.BUCKET_NAME, "F4m7fSDig0/"+ file.getName(),file);
+            transferObserver.setTransferListener(
+                    new TransferListener() {
+                        @Override
+                        public void onStateChanged(int i, TransferState transferState) {
+                            if (transferState == TransferState.COMPLETED) {
+                                uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
+                                numberOfFilesUploaded++;
+                            }
+                        }
+
+                        @Override
+                        public void onProgressChanged(int i, long l, long l1) {
+
+                        }
+
+                        @Override
+                        public void onError(int i, Exception e) {
+
+                        }
+                    }
+
+            );
+            transferObservers.add( transferObserver);
+        }
+
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
 
@@ -225,9 +274,23 @@ public class MainActivity extends Activity
         emotionFrameData.save();
 
         ParseObject userSurvey = new ParseObject("SurveyData");
-        userSurvey.put("UserID",ParseUser.getCurrentUser());
-        userSurvey.put("JsonEmotionData",emotionFrameData);
+        userSurvey.put("UserID", ParseUser.getCurrentUser());
+        userSurvey.put("JsonEmotionData", emotionFrameData);
         userSurvey.save();
+
+        //get survey id and name the images folder as survey id
+        File oldName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ surveyImagesDeviceDirectory );
+        File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ userSurvey.getObjectId());
+        oldName.renameTo(newName);
+
+        TransferUtility transferUtility;
+        transferUtility = Util.getTransferUtility(this);
+        //uploading the images folder to s3
+        ArrayList <TransferObserver> transferObserver = new ArrayList<TransferObserver>();
+        for (File file:newName.listFiles()) {
+            transferObserver.add(transferUtility.upload(Util.BUCKET_NAME, file.getName(), file));
+        }
+
         Intent intent = new Intent(MainActivity.this,
                 UserPickActivity.class);
         startActivity(intent);

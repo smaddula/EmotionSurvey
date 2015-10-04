@@ -34,5 +34,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['gson*.jar'])
     compile fileTree(dir: 'libs', include: ['javax*.jar'])
     compile fileTree(dir: 'libs', include: ['ParseCrash*.jar'])
+    compile fileTree(dir: 'libs', include: ['aws-android-sdk-core*.jar'])
+    compile fileTree(dir: 'libs', include: ['aws-android-sdk-s3*.jar'])
+    compile fileTree(dir: 'libs/extras', include: ['aws-android-sdk-cognito*.jar'])
 
 }

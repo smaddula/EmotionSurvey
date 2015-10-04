@@ -51,15 +51,15 @@
                 <RadioGroup android:id="@+id/valenceRadioGroup" android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1"
                     android:layout_height="wrap_content" android:onClick="onRadioButtonClicked">
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_happiest" android:tag="5"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlehappy" android:tag="4"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_neutral" android:tag="3"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlesad" android:tag="2"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_verysad" android:tag="1"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
+                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
                 </RadioGroup>
 
             </LinearLayout>
@@ -105,6 +105,27 @@
                 android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/layoutUploadProgress"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            >
+        <ProgressBar
+            android:id="@+id/uploadProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:indeterminate="false"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_marginRight="5dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Uploading Data" />
+    </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:id="@+id/footerButtonContainer"

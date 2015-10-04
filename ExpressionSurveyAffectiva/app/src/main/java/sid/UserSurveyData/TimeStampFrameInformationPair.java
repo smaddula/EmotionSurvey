@@ -15,9 +15,5 @@ public class TimeStampFrameInformationPair {
         datetime = param_date;
         score = value;
     }
-    TimeStampFrameInformationPair(Date param_date, Face face) {
-        datetime = param_date;
-        score = new FrameInformation(face);
-    }
 
 }
