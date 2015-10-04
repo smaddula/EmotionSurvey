@@ -11,7 +11,6 @@ import java.util.Date;
 public class TimeStampFrameInformationPair {
     public Date datetime;
     public FrameInformation score;
-    private static SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSS");
     TimeStampFrameInformationPair(Date param_date, FrameInformation value) {
         datetime = param_date;
         score = value;

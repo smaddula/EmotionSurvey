@@ -2,13 +2,13 @@ package sid.expressionsurveyaffectiva;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,14 +17,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
@@ -38,7 +32,6 @@ import android.widget.TextView;
 
 
 import com.affectiva.android.affdex.sdk.Frame;
-import com.affectiva.android.affdex.sdk.Frame.ROTATE;
 import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
@@ -52,23 +45,19 @@ import com.parse.ParseUser;
 
 import sid.UserSurveyData.FrameInformation;
 import sid.UserSurveyData.FullSurveyData;
-import sid.UserSurveyData.TimeStampFrameInformationPair;
 
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
-    int segmentId;
-    String APP_UUID = UUID.randomUUID().toString();
-    String FolderPath;
-    boolean savedImage = false;
+    int questionIterator;
+    String surveyImagesDeviceDirectory = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss'.tsv'").format(new Date());
+    boolean saveImage = true;
     FullSurveyData userData = new FullSurveyData();
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion;
     RadioGroup valenceRadioGroup ;
     LinearLayout surfaceViewContainer , footerButtonsContainer;
-
-    ViewPager mViewPager;
 
     private SurfaceView cameraPreview;
     private CameraDetector detector;
@@ -101,51 +90,57 @@ public class MainActivity extends Activity
             //Log.v(LOG_TAG, "No face found");
             return;
         }
-        savedImage = false;
-        if (!savedImage) {
-            try {
+        //TODO:If saving is slowing the frame rate use a ThreadPool and move the saving logic to a different class
 
+        saveImage = false;
+        String UserFaceImageName = "";
+        if (!saveImage) {
+            try {
+                UserFaceImageName = Long.toString(System.nanoTime())+".jpg";
                 int width = image.getWidth();
                 int height = image.getHeight();
 
                 String path = Environment.getExternalStorageDirectory().toString();
                 OutputStream fOut = null;
-                File file = new File(path, "FitnessGirl.jpg"); // the File to save to
+                // Naming the file randomly
+                File file = new File(surveyImagesDeviceDirectory+ "/" + UserFaceImageName);
                 fOut = new FileOutputStream(file);
+                //TODO: Save file as Yuv instead of bitmap and converting to jpg
+                //investigate how to rotate a Yuv image to make this optimization
                 YuvImage img = new YuvImage(
                         ((Frame.ByteArrayFrame) image).getByteArray(), ImageFormat.NV21 , width,height,null);
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 img.compressToJpeg(new Rect(0,0,width,height),100,out);
                 byte[] imageBytes = out.toByteArray();
-                Bitmap image1 = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                Bitmap bitmapImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
                 switch (image.getTargetRotation()) {
                     case BY_90_CCW:
-                        image1 = Frame.rotateImage(image1,-90);
+                        bitmapImage = Frame.rotateImage(bitmapImage,-90);
                         break;
                     case BY_90_CW:
-                        image1 = Frame.rotateImage(image1,90);
+                        bitmapImage = Frame.rotateImage(bitmapImage,90);
                         break;
                     case BY_180:
-                        image1 = Frame.rotateImage(image1,180);
+                        bitmapImage = Frame.rotateImage(bitmapImage,180);
                         break;
                     default:
                         //keep bitmap as it is
                 }
 
-                image1.compress(Bitmap.CompressFormat.JPEG,100,fOut);
+                bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
 
                 fOut.flush();
                 fOut.close();
-                savedImage=true;
+                saveImage=true;
             } catch (IOException e) {
+                UserFaceImageName = "";
                 e.printStackTrace();
             }
         }
 
         Face face = faces.get(0);
-        userData.AddFrameData(currentQuestion, new FrameInformation( face ));
-
+        userData.AddFrameData(currentQuestion, new FrameInformation( face , UserFaceImageName ));
     }
 
     @Override
@@ -159,12 +154,9 @@ public class MainActivity extends Activity
         surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
 
-
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
 
-        segmentId = 0 ;
-        FolderPath = getExternalFilesDir(null) + File.separator + APP_UUID;
-
+        questionIterator = 0 ;
         cameraPreview = (SurfaceView) findViewById(R.id.cameraId);
         // Put the SDK in camera mode by using this constructor. The SDK will be in control of
         // the camera. If a SurfaceView is passed in as the last argument to the constructor,
@@ -211,8 +203,14 @@ public class MainActivity extends Activity
     public void loadNextQuestion( View view ){
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
+        saveImage = true;
         FinishServingQuestion();
         loadData();
+    }
+
+
+    public void onRadioButtonClicked(View view){
+        saveImage = false;
     }
 
     @Override
@@ -240,22 +238,22 @@ public class MainActivity extends Activity
     {
         if(allQuestions.size()==0)
             return;
-        currentQuestion = allQuestions.get( segmentId );
+        currentQuestion = allQuestions.get( questionIterator );
         ImageView imageView = ((ImageView) findViewById(R.id.image));
         new DownloadImageTask(imageView)
                 .execute(currentQuestion.ImageURI);
         ((TextView)findViewById(R.id.text_view)).setText( currentQuestion.QuestionHeading);
 
-        if(segmentId == allQuestions.size() - 1)
+        if(questionIterator == allQuestions.size() - 1)
         {
             ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
             ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
-            segmentId = 0;
+            questionIterator = 0;
         } else
         {
             ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
             ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
-            segmentId++;
+            questionIterator++;
         }
     }
 }

@@ -48,7 +48,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <RadioGroup android:id="@+id/valenceRadioGroup" android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                <RadioGroup android:id="@+id/valenceRadioGroup" android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:onClick="onRadioButtonClicked">
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_happiest" android:tag="5"
                         android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1"></RadioButton>
                     <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlehappy" android:tag="4"
