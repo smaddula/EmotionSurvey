@@ -83,8 +83,8 @@ public class MainActivity extends Activity
     @Override
     public void onFaceDetectionStopped() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
-            footerButtonsContainer.setVisibility(View.GONE);
             surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            footerButtonsContainer.setVisibility(View.GONE);
         }
         return;
     }
@@ -184,6 +184,9 @@ public class MainActivity extends Activity
                             if (transferState == TransferState.COMPLETED) {
                                 uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
                                 numberOfFilesUploaded++;
+                                if(numberOfFilesUploaded == uploadProgressBar.getMax()){
+                                    uploadComplete();
+                                }
                             }
                         }
 
@@ -291,6 +294,10 @@ public class MainActivity extends Activity
             transferObserver.add(transferUtility.upload(Util.BUCKET_NAME, file.getName(), file));
         }
 
+        uploadComplete();
+    }
+
+    public void uploadComplete(){
         Intent intent = new Intent(MainActivity.this,
                 UserPickActivity.class);
         startActivity(intent);
