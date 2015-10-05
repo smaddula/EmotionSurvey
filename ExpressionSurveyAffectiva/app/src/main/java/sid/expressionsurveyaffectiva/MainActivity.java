@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.opengl.Visibility;
 import android.os.Environment;
 import android.os.Bundle;
 import android.view.SurfaceView;
@@ -55,7 +56,6 @@ import sid.UserSurveyData.FullSurveyData;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
-    ArrayList <TransferObserver> transferObservers;
     int questionIterator;
     int numberOfFilesUploaded;
     String surveyImagesDeviceDirectory = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
@@ -75,7 +75,7 @@ public class MainActivity extends Activity
     @Override
     public void onFaceDetectionStarted() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
-            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
+            cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
             footerButtonsContainer.setVisibility(View.VISIBLE);
         }
     }
@@ -83,7 +83,7 @@ public class MainActivity extends Activity
     @Override
     public void onFaceDetectionStopped() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
-            surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
             footerButtonsContainer.setVisibility(View.GONE);
         }
         return;
@@ -101,9 +101,8 @@ public class MainActivity extends Activity
         }
         //TODO:If saving is slowing the frame rate use a ThreadPool and move the saving logic to a different class
 
-        saveImage = false;
         String UserFaceImageName = "";
-        if (!saveImage) {
+        if (saveImage) {
             try {
                 UserFaceImageName = Long.toString(System.nanoTime())+".jpg";
                 int width = image.getWidth();
@@ -153,8 +152,6 @@ public class MainActivity extends Activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Enable Local Datastore.
-
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -164,46 +161,6 @@ public class MainActivity extends Activity
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
         uploadProgressBarContainer = (LinearLayout)findViewById(R.id.layoutUploadProgress);
         uploadProgressBar = (ProgressBar)findViewById(R.id.uploadProgressBar);
-
-
-        TransferUtility transferUtility;
-        transferUtility = Util.getTransferUtility(this);
-        File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ "F4m7fSDig0");
-        //uploading the images folder to s3
-        transferObservers = new ArrayList<TransferObserver>();
-        TransferObserver transferObserver;
-
-        numberOfFilesUploaded = 0;
-        uploadProgressBar.setMax(newName.listFiles().length);
-        for (File file:newName.listFiles()) {
-            transferObserver= transferUtility.upload(Util.BUCKET_NAME, "F4m7fSDig0/"+ file.getName(),file);
-            transferObserver.setTransferListener(
-                    new TransferListener() {
-                        @Override
-                        public void onStateChanged(int i, TransferState transferState) {
-                            if (transferState == TransferState.COMPLETED) {
-                                uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
-                                numberOfFilesUploaded++;
-                                if(numberOfFilesUploaded == uploadProgressBar.getMax()){
-                                    uploadComplete();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onProgressChanged(int i, long l, long l1) {
-
-                        }
-
-                        @Override
-                        public void onError(int i, Exception e) {
-
-                        }
-                    }
-
-            );
-            transferObservers.add( transferObserver);
-        }
 
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
@@ -286,15 +243,43 @@ public class MainActivity extends Activity
         File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ userSurvey.getObjectId());
         oldName.renameTo(newName);
 
+        uploadProgressBarContainer.setVisibility(View.VISIBLE);
+        footerButtonsContainer.setVisibility(View.GONE);
+
         TransferUtility transferUtility;
         transferUtility = Util.getTransferUtility(this);
         //uploading the images folder to s3
-        ArrayList <TransferObserver> transferObserver = new ArrayList<TransferObserver>();
-        for (File file:newName.listFiles()) {
-            transferObserver.add(transferUtility.upload(Util.BUCKET_NAME, file.getName(), file));
-        }
+        TransferObserver transferObserver;
 
-        uploadComplete();
+        numberOfFilesUploaded = 0;
+        uploadProgressBar.setMax(newName.listFiles().length);
+        for (File file:newName.listFiles()) {
+            transferObserver= transferUtility.upload(Util.BUCKET_NAME, userSurvey.getObjectId() + File.separator + file.getName(),file);
+            transferObserver.setTransferListener(
+                    new TransferListener() {
+                        @Override
+                        public void onStateChanged(int i, TransferState transferState) {
+                            if (transferState == TransferState.COMPLETED) {
+                                uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
+                                numberOfFilesUploaded++;
+                                if(numberOfFilesUploaded == uploadProgressBar.getMax()){
+                                    uploadComplete();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onProgressChanged(int i, long l, long l1) {
+
+                        }
+
+                        @Override
+                        public void onError(int i, Exception e) {
+
+                        }
+                    }
+            );
+        }
     }
 
     public void uploadComplete(){
