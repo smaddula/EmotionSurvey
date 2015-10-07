@@ -29,7 +29,7 @@ public class FullSurveyData {
         currentUserQuestionData.valenceUserInput = valenceUserInput;
     }
 
-    public FullSurveyData(){
+    public FullSurveyData(String imagesPath){
         questionSurveyData = new ArrayList<UserQuestionData>();
         currentQuestion = null;
         currentUserQuestionData = null;

@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -37,11 +38,6 @@ import com.affectiva.android.affdex.sdk.Frame;
 import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
-import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.parse.FindCallback;
@@ -57,10 +53,14 @@ public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
     int questionIterator;
-    int numberOfFilesUploaded;
+    int numberOfFilesUploaded = 0;
+    int numberOfFilesToUpload = 0 ;
+    boolean surveyComplete = false;
     String surveyImagesDeviceDirectory = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
+    String SurveyImagesS3Directory ;
     boolean saveImage = true;
-    FullSurveyData userData = new FullSurveyData();
+    FullSurveyData userData ;
+    UploadImagesBackgroundTask s3upload ;
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion;
@@ -112,6 +112,7 @@ public class MainActivity extends Activity
                 //String dirPath =  ;//+ File.separator +  surveyImagesDeviceDirectory;
                 File file = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator+ surveyImagesDeviceDirectory+ File.separator + UserFaceImageName);
                 file.getParentFile().mkdirs();
+
                 OutputStream fOut = new FileOutputStream(file);
                 //TODO: Save file as Yuv instead of bitmap and converting to jpg
                 //investigate how to rotate a Yuv image to make this optimization
@@ -140,6 +141,8 @@ public class MainActivity extends Activity
 
                 fOut.flush();
                 fOut.close();
+                numberOfFilesToUpload++;
+                s3upload.push(file.getAbsolutePath());
             } catch (IOException e) {
                 UserFaceImageName = "";
                 e.printStackTrace();
@@ -157,6 +160,10 @@ public class MainActivity extends Activity
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SurveyImagesS3Directory = ParseUser.getCurrentUser().getUsername()+ "_" + surveyImagesDeviceDirectory ;
+        userData = new FullSurveyData(SurveyImagesS3Directory);
+
         surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
         uploadProgressBarContainer = (LinearLayout)findViewById(R.id.layoutUploadProgress);
@@ -164,6 +171,21 @@ public class MainActivity extends Activity
 
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
+
+        s3upload = new UploadImagesBackgroundTask(new IEvent() {
+            @Override
+            public void callback() {
+                uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
+                uploadProgressBar.setMax(numberOfFilesToUpload);
+                numberOfFilesUploaded++;
+                if(numberOfFilesUploaded == numberOfFilesToUpload && surveyComplete ){
+                    uploadComplete();
+                }
+            }
+        } , this , SurveyImagesS3Directory );
+
+        Thread uploaderThread = new Thread(s3upload);
+        uploaderThread.start();
 
         questionIterator = 0 ;
         cameraPreview = (SurfaceView) findViewById(R.id.cameraId);
@@ -206,20 +228,22 @@ public class MainActivity extends Activity
     public void FinishServingQuestion(){
         RadioButton rb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
         userData.setUserInput(Integer.parseInt(rb.getTag().toString()));
-        valenceRadioGroup.clearCheck();
+        if(!surveyComplete)
+            valenceRadioGroup.clearCheck();
     }
 
     public void loadNextQuestion( View view ){
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
         saveImage = true;
+        s3upload.Pause();
         FinishServingQuestion();
         loadData();
     }
-
-
+    
     public void onRadioButtonClicked(View view){
         saveImage = false;
+        s3upload.Resume();
     }
 
     @Override
@@ -228,6 +252,8 @@ public class MainActivity extends Activity
     }
 
     public void SaveData(View view) throws IOException, com.parse.ParseException {
+        detector.stop();
+        surveyComplete = true;
         FinishServingQuestion();
         String result = gson.toJson(userData);
         ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
@@ -239,21 +265,21 @@ public class MainActivity extends Activity
         userSurvey.save();
 
         //get survey id and name the images folder as survey id
-        File oldName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ surveyImagesDeviceDirectory );
-        File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ userSurvey.getObjectId());
-        oldName.renameTo(newName);
+//        File oldName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ surveyImagesDeviceDirectory );
+//        File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ userSurvey.getObjectId());
+//        oldName.renameTo(newName);
 
         uploadProgressBarContainer.setVisibility(View.VISIBLE);
         footerButtonsContainer.setVisibility(View.GONE);
 
-        TransferUtility transferUtility;
-        transferUtility = Util.getTransferUtility(this);
+//        TransferUtility transferUtility;
+//        transferUtility = Util.getTransferUtility(this);
         //uploading the images folder to s3
-        TransferObserver transferObserver;
+//        TransferObserver transferObserver;
 
-        numberOfFilesUploaded = 0;
-        uploadProgressBar.setMax(newName.listFiles().length);
-        for (File file:newName.listFiles()) {
+//        numberOfFilesUploaded = 0;
+        uploadProgressBar.setMax(numberOfFilesToUpload);
+/*        for (File file:newName.listFiles()) {
             transferObserver= transferUtility.upload(Util.BUCKET_NAME, userSurvey.getObjectId() + File.separator + file.getName(),file);
             transferObserver.setTransferListener(
                     new TransferListener() {
@@ -279,6 +305,9 @@ public class MainActivity extends Activity
                         }
                     }
             );
+        }*/
+        if(numberOfFilesToUpload == numberOfFilesUploaded){
+            uploadComplete();
         }
     }
 
