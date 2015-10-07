@@ -52,11 +52,12 @@ import sid.UserSurveyData.FullSurveyData;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
+    long lastImageSavedMillisecond = 0;
     int questionIterator;
     int numberOfFilesUploaded = 0;
     int numberOfFilesToUpload = 0 ;
     boolean surveyComplete = false;
-    String surveyImagesDeviceDirectory = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(new Date());
+    String surveyImagesDeviceDirectory ;
     String SurveyImagesS3Directory ;
     boolean saveImage = true;
     FullSurveyData userData ;
@@ -102,51 +103,14 @@ public class MainActivity extends Activity
         //TODO:If saving is slowing the frame rate use a ThreadPool and move the saving logic to a different class
 
         String UserFaceImageName = "";
-        if (saveImage) {
-            try {
-                UserFaceImageName = Long.toString(System.nanoTime())+".jpg";
-                int width = image.getWidth();
-                int height = image.getHeight();
+        long currentMillisecond = System.currentTimeMillis();
+        if (saveImage && currentMillisecond - lastImageSavedMillisecond > 200) {
+            //Try saving image every 500 millisecond
+            lastImageSavedMillisecond = currentMillisecond;
 
-                // Naming the file randomly
-                //String dirPath =  ;//+ File.separator +  surveyImagesDeviceDirectory;
-                File file = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator+ surveyImagesDeviceDirectory+ File.separator + UserFaceImageName);
-                file.getParentFile().mkdirs();
-
-                OutputStream fOut = new FileOutputStream(file);
-                //TODO: Save file as Yuv instead of bitmap and converting to jpg
-                //investigate how to rotate a Yuv image to make this optimization
-                YuvImage img = new YuvImage(
-                        ((Frame.ByteArrayFrame) image).getByteArray(), ImageFormat.NV21 , width,height,null);
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                img.compressToJpeg(new Rect(0,0,width,height),100,out);
-                byte[] imageBytes = out.toByteArray();
-                Bitmap bitmapImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-                switch (image.getTargetRotation()) {
-                    case BY_90_CCW:
-                        bitmapImage = Frame.rotateImage(bitmapImage,-90);
-                        break;
-                    case BY_90_CW:
-                        bitmapImage = Frame.rotateImage(bitmapImage,90);
-                        break;
-                    case BY_180:
-                        bitmapImage = Frame.rotateImage(bitmapImage,180);
-                        break;
-                    default:
-                        //keep bitmap as it is
-                }
-
-                bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-
-                fOut.flush();
-                fOut.close();
-                numberOfFilesToUpload++;
-                s3upload.push(file.getAbsolutePath());
-            } catch (IOException e) {
-                UserFaceImageName = "";
-                e.printStackTrace();
-            }
+            UserFaceImageName = Long.toString(System.nanoTime()) + ".jpg";
+            numberOfFilesToUpload++;
+            s3upload.push(image, UserFaceImageName);
         }
 
         Face face = faces.get(0);
@@ -160,8 +124,10 @@ public class MainActivity extends Activity
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Date currentDate = new Date();
+        SurveyImagesS3Directory = ParseUser.getCurrentUser().getUsername()+ "_" +new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate) ;
+        surveyImagesDeviceDirectory = getExternalFilesDir(null).getAbsolutePath() + File.separator + new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate);
 
-        SurveyImagesS3Directory = ParseUser.getCurrentUser().getUsername()+ "_" + surveyImagesDeviceDirectory ;
         userData = new FullSurveyData(SurveyImagesS3Directory);
 
         surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
@@ -172,17 +138,17 @@ public class MainActivity extends Activity
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
 
-        s3upload = new UploadImagesBackgroundTask(new IEvent() {
+        s3upload = new UploadImagesBackgroundTask( new IEvent() {
             @Override
-            public void callback() {
-                uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
+            public void callback(int completedUploads) {
+                numberOfFilesUploaded = completedUploads;
                 uploadProgressBar.setMax(numberOfFilesToUpload);
-                numberOfFilesUploaded++;
+                uploadProgressBar.setProgress(numberOfFilesUploaded);
                 if(numberOfFilesUploaded == numberOfFilesToUpload && surveyComplete ){
                     uploadComplete();
                 }
             }
-        } , this , SurveyImagesS3Directory );
+        } , this , surveyImagesDeviceDirectory , SurveyImagesS3Directory );
 
         Thread uploaderThread = new Thread(s3upload);
         uploaderThread.start();
@@ -194,14 +160,10 @@ public class MainActivity extends Activity
         // that view will be painted with what the camera sees.
 
         detector = new CameraDetector(this, CameraDetector.CameraType.CAMERA_FRONT, cameraPreview);
-
         detector.setLicensePath("sdk_kusuma.chunduru@gmail.com.license");
-
         detector.setMaxProcessRate(20);
-
         detector.setImageListener(this);
         detector.setFaceListener(this);
-
         detector.setDetectAllEmotions(true);
         detector.setDetectAllExpressions(true);
 
@@ -236,14 +198,14 @@ public class MainActivity extends Activity
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
         saveImage = true;
-        s3upload.Pause();
+        //s3upload.Pause();
         FinishServingQuestion();
         loadData();
     }
-    
+
     public void onRadioButtonClicked(View view){
         saveImage = false;
-        s3upload.Resume();
+        //s3upload.Resume();
     }
 
     @Override
@@ -254,6 +216,7 @@ public class MainActivity extends Activity
     public void SaveData(View view) throws IOException, com.parse.ParseException {
         detector.stop();
         surveyComplete = true;
+        s3upload.surveyComplete();
         FinishServingQuestion();
         String result = gson.toJson(userData);
         ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
@@ -264,80 +227,48 @@ public class MainActivity extends Activity
         userSurvey.put("JsonEmotionData", emotionFrameData);
         userSurvey.save();
 
-        //get survey id and name the images folder as survey id
-//        File oldName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ surveyImagesDeviceDirectory );
-//        File newName = new File(getExternalFilesDir(null).getAbsoluteFile()+File.separator+ userSurvey.getObjectId());
-//        oldName.renameTo(newName);
-
         uploadProgressBarContainer.setVisibility(View.VISIBLE);
         footerButtonsContainer.setVisibility(View.GONE);
 
-//        TransferUtility transferUtility;
-//        transferUtility = Util.getTransferUtility(this);
-        //uploading the images folder to s3
-//        TransferObserver transferObserver;
-
-//        numberOfFilesUploaded = 0;
         uploadProgressBar.setMax(numberOfFilesToUpload);
-/*        for (File file:newName.listFiles()) {
-            transferObserver= transferUtility.upload(Util.BUCKET_NAME, userSurvey.getObjectId() + File.separator + file.getName(),file);
-            transferObserver.setTransferListener(
-                    new TransferListener() {
-                        @Override
-                        public void onStateChanged(int i, TransferState transferState) {
-                            if (transferState == TransferState.COMPLETED) {
-                                uploadProgressBar.setProgress(numberOfFilesUploaded + 1);
-                                numberOfFilesUploaded++;
-                                if(numberOfFilesUploaded == uploadProgressBar.getMax()){
-                                    uploadComplete();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onProgressChanged(int i, long l, long l1) {
-
-                        }
-
-                        @Override
-                        public void onError(int i, Exception e) {
-
-                        }
-                    }
-            );
-        }*/
         if(numberOfFilesToUpload == numberOfFilesUploaded){
             uploadComplete();
         }
     }
 
     public void uploadComplete(){
+
+        //Delete the local directory
+        /*File dir = new File(surveyImagesDeviceDirectory);
+        if (dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++)
+            {
+                new File(dir, children[i]).delete();
+            }
+            dir.delete();
+        }*/
+
+        //switch to a different view
         Intent intent = new Intent(MainActivity.this,
                 UserPickActivity.class);
         startActivity(intent);
         finish();
     }
 
-    public void loadData(  )
-    {
-        if(allQuestions.size()==0)
+    public void loadData(  ) {
+        if (allQuestions.size() == 0)
             return;
-        currentQuestion = allQuestions.get( questionIterator );
+        currentQuestion = allQuestions.get(questionIterator);
         ImageView imageView = ((ImageView) findViewById(R.id.image));
+
         new DownloadImageTask(imageView)
                 .execute(currentQuestion.ImageURI);
-        ((TextView)findViewById(R.id.text_view)).setText( currentQuestion.QuestionHeading);
+        ((TextView) findViewById(R.id.text_view)).setText(currentQuestion.QuestionHeading);
 
-        if(questionIterator == allQuestions.size() - 1)
-        {
-            ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
-            ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
-            questionIterator = 0;
-        } else
-        {
-            ((Button)findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
-            ((Button)findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
-            questionIterator++;
-        }
+        ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
+        ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
+        questionIterator++;
     }
 }
