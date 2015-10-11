@@ -5,6 +5,8 @@ var margin = {top: 20, right: 80, bottom: 30, left: 50},
 var x;
 var y;
 var data = [];
+
+var s3BucketURL ;
 var QuestionInfo = [];
 
 var svg;
@@ -20,18 +22,20 @@ function D3MultiLineChart (RawData) {
 
     QuestionInfo.length = 0
     data.length = 0
+    s3BucketURL = RawData["serverImagesPath"]
     RawData["questionSurveyData"].forEach(
         function(r){
             QuestionInfo.push( {
                 imageURI : r["imageURI"],
-                questionEndTime : r["questionEndTime"],
-                questionStartTime : r["questionStartTime"]
+                questionEndTime : parseDate( r["questionEndTime"] ),
+                questionStartTime : parseDate( r["questionStartTime"]),
+                motorActionPerformed : parseDate( r["motorActionPerformed"] )
             });
 
             r["frameData"].forEach(function(s){
 
                 var obj = {};
-                obj["datetime"] = s["datetime"];
+                obj["time"] = parseDate( s["datetime"]);
                 var scoreObject = {};
                 for(property in s["score"]["frameEmotionInfo"]){
                     scoreObject[property] = s["score"]["frameEmotionInfo"][property];
@@ -40,6 +44,8 @@ function D3MultiLineChart (RawData) {
                     scoreObject[property] = s["score"]["frameExpressionInfo"][property];
                 }
                 obj["score"] = scoreObject;
+                obj["userCameraImagePath"] = s["score"]["userCameraImagePath"];
+                obj["afterMotorAction"] = s["score"]["afterMotorAction"];
                 data.push(obj);
             });
         }
@@ -74,10 +80,6 @@ function D3MultiLineChart (RawData) {
 
 
     color.domain(d3.keys(data[0].score));
-
-    data.forEach(function(d) {
-        d.time = parseDate(d.datetime);
-    });
 
     var cities = color.domain().map(function(name) {
         return {
@@ -130,6 +132,96 @@ function D3MultiLineChart (RawData) {
         .style("stroke", function(d) { return color(d.name); })
         .style("opacity",0);
 
+
+    // Define 'div' for tooltips
+    var div = d3.select("body")
+        .append("div")  // declare the tooltip div
+        .attr("class", "tooltip")              // apply the 'tooltip' class
+        .style("opacity", 0);
+
+
+    svg.append("circle")
+        .attr("class", "y")
+        .style("fill", "green")
+        .style("stroke", "blue")
+        .attr("r", 4)
+        .attr("opacity",0)
+
+    var bisectDate = d3.bisector(function(d) { return d.time; }).left;
+
+    svg.append("rect")
+        .classed("DatePickerMousePosition",true)
+        .attr(
+        {
+            "x":x(x.domain()[0]),
+            "y":y(y.domain()[0])-20,
+            "width": x(x.domain()[1])-x(x.domain()[0]),
+            "height":40
+        })
+        .attr("fill","gray")
+        .attr("opacity","0")
+        .on("mouseout", function(){
+
+            svg.select("circle.y")
+                .attr("opacity",0)
+        })
+        .on("mousemove", function(){
+            var x0 = x.invert(d3.mouse(this)[0]);
+            var ycoordinate = d3.mouse(this)[1];
+
+            var i = bisectDate(data, x0, 1);
+            var d0 = data[i - 1];
+            var d1 = data[i];
+            var d = x0 - d0.time > d1.time - x0 ? d1 : d0;
+
+            svg.select("circle.y")
+                .attr("transform",
+                "translate(" + x(d.time) + "," +
+                y(y.domain()[0]) + ")")
+                .attr("opacity",1)
+                .style("fill",function(){
+                    if(d.afterMotorAction == true){
+                        return "red";
+                    }
+                    return "black";
+                })
+
+            if( Math.abs( x(d.time) - x(x0) ) < 6 && Math.abs( y(y.domain()[0]) - ycoordinate ) < 6 ){
+                console.log("inside the circle")
+                svg.selectAll(".tooltipLine")
+                    .attr("stroke","gray")
+                    .remove()
+
+                svg.append("line")
+                    .attr("class","tooltipLine")
+                    .attr( {
+                        "x1":x(d.time),
+                        "y1":y(y.domain()[0]),
+                        "x2":x(d.time),
+                        "y2":y(y.domain()[1]),
+                        "stroke":"gray"
+                    } )
+                    .style("pointer-events", "none");
+
+                div
+                    .style("opacity", 1)
+                    .style("pointer-events", "none");;
+
+                div	.html(
+                    d.userCameraImagePath != "" ?
+                    '<img class="RotateImage" height = "90" width = "140"  src = "' + s3BucketURL + d.userCameraImagePath +'">' : ""
+                )
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+            }else{
+                console.log("out of the small circle")
+                div
+                    .style("opacity", 0);
+                svg.selectAll(".tooltipLine").transition().duration(100).attr("stroke","gray").transition().duration(100).remove()
+
+            }
+        });
+
     var allEmotions = d3.select("#jsonDataDisplay").append("div")
         .attr("class","container-fluid row")
         .selectAll(".emotionConfigurations").data(color.domain())
@@ -176,39 +268,51 @@ function ClickedQuestionImage (d){
     d3.selectAll("img,.selected").classed("selected",false);
 
 
+    d3.select(this).classed("selected",!isSelected);
+
     if(!isSelected){
         d3.select(this)
             .attr("width",(width/QuestionInfo.length)*1.5)
             .attr("height",(width/QuestionInfo.length)*1.5);
-    }
 
+        svg.append("line")
+            .attr("class","BoundryLine")
+            .attr(
+            {
+                "x1":x(d.motorActionPerformed),
+                "y1":y(y.domain()[1]),
+                "x2":x(d.motorActionPerformed),
+                "y2":y(y.domain()[0]),
+                "stroke":"red",
+                "stroke-width":2,
+                "stroke-dasharray":"5,5"
+            }
+        );
 
-    d3.select(this).classed("selected",!isSelected);
-
-    if(!isSelected){
         svg.append("rect")
             .classed("BoundryLine",true)
             .attr(
             {
-                "x":x(parseDate(d.questionStartTime)),
+                "x":x(d.questionStartTime),
                 "y":y(y.domain()[1]),
                 "width": function(b){
-                    if(d.questionEndTime)
-                    {
-                        return x(parseDate(d.questionEndTime))-x(parseDate(d.questionStartTime));
-                    }
-                    return x(x.domain()[1])-x(parseDate(d.questionStartTime));
+                    return x(d.questionEndTime)-x(d.questionStartTime);
                 },
                 "height":y(y.domain()[0])-y(y.domain()[1])
-            }
-        )
-            .attr("fill","black")
+            })
+            .attr("fill","grey")
+            .attr("stroke","black")
             .attr("opacity",".5")
-            .on("click", BoundingBoxClicked);
+            .style("pointer-events", "none")
+            //.on("click", BoundingBoxClicked);
     }
 };
 
 function BoundingBoxClicked(d) {
+    div
+        .style("opacity", 0);
+    svg.selectAll(".tooltipLine").remove()
+
     var clickedBoundry = d3.select(this);
     var isActiveAlready = d3.select(this).classed("active");
 
@@ -233,6 +337,11 @@ function BoundingBoxClicked(d) {
 
 };
 function resetAxisZoom() {
+
+    div.style("opacity", 0);
+    svg.selectAll(".tooltipLine").remove()
+
+
     x.domain(d3.extent(data, function(d) { return d.time; }));
     d3.selectAll(".xaxis")
         .transition().duration(1500).ease("sin-in-out")
