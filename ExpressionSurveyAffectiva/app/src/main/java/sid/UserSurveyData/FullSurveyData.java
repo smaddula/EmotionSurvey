@@ -12,6 +12,7 @@ public class FullSurveyData {
     public List<UserQuestionData> questionSurveyData ;
     private transient Question currentQuestion;
     private transient UserQuestionData currentUserQuestionData;
+    public String serverImagesPath ;
     public void AddFrameData(Question question , FrameInformation frameInformation){
         if(question!=null) {
             if (currentQuestion == null || question.parseQuestionData.getObjectId() != currentUserQuestionData.QuestionObjectId) {
@@ -30,6 +31,7 @@ public class FullSurveyData {
     }
 
     public FullSurveyData(String imagesPath){
+        serverImagesPath = imagesPath;
         questionSurveyData = new ArrayList<UserQuestionData>();
         currentQuestion = null;
         currentUserQuestionData = null;

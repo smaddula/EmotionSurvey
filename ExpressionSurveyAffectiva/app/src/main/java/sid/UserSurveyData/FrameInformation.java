@@ -12,12 +12,14 @@ public class FrameInformation {
     FrameExpressionInfo frameExpressionInfo;
     FrameOrientationInfo frameOrientationInfo;
     String userCameraImagePath;
+    boolean afterMotorAction;
 
-    public FrameInformation(Face face , String userFaceImage ){
+    public FrameInformation(Face face , String userFaceImage , boolean aftermotoraction ){
         frameEmotionInfo = new FrameEmotionInfo(face);
         frameExpressionInfo = new FrameExpressionInfo(face);
         frameOrientationInfo = new FrameOrientationInfo(face);
         userCameraImagePath = userFaceImage;
+        afterMotorAction = aftermotoraction;
     }
 
 }

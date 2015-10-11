@@ -59,7 +59,7 @@ public class MainActivity extends Activity
     boolean surveyComplete = false;
     String surveyImagesDeviceDirectory ;
     String SurveyImagesS3Directory ;
-    boolean saveImage = true;
+    boolean questionMotorActionPerformed = false;
     FullSurveyData userData ;
     UploadImagesBackgroundTask s3upload ;
     List<Question> allQuestions = new ArrayList<Question>();
@@ -104,7 +104,7 @@ public class MainActivity extends Activity
 
         String UserFaceImageName = "";
         long currentMillisecond = System.currentTimeMillis();
-        if (saveImage && currentMillisecond - lastImageSavedMillisecond > 200) {
+        if (!questionMotorActionPerformed && currentMillisecond - lastImageSavedMillisecond > 200) {
             //Try saving image every 500 millisecond
             lastImageSavedMillisecond = currentMillisecond;
 
@@ -114,7 +114,7 @@ public class MainActivity extends Activity
         }
 
         Face face = faces.get(0);
-        userData.AddFrameData(currentQuestion, new FrameInformation( face , UserFaceImageName ));
+        userData.AddFrameData(currentQuestion, new FrameInformation( face , UserFaceImageName , questionMotorActionPerformed ));
     }
 
     @Override
@@ -128,7 +128,7 @@ public class MainActivity extends Activity
         SurveyImagesS3Directory = ParseUser.getCurrentUser().getUsername()+ "_" +new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate) ;
         surveyImagesDeviceDirectory = getExternalFilesDir(null).getAbsolutePath() + File.separator + new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate);
 
-        userData = new FullSurveyData(SurveyImagesS3Directory);
+        userData = new FullSurveyData("https://s3.amazonaws.com/surveyfacesnaps/"+SurveyImagesS3Directory+"/");
 
         surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
@@ -192,20 +192,20 @@ public class MainActivity extends Activity
         userData.setUserInput(Integer.parseInt(rb.getTag().toString()));
         if(!surveyComplete)
             valenceRadioGroup.clearCheck();
+        else
+            userData.DoneSurvey();
     }
 
     public void loadNextQuestion( View view ){
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
-        saveImage = true;
-        //s3upload.Pause();
+        questionMotorActionPerformed = false;
         FinishServingQuestion();
         loadData();
     }
 
     public void onRadioButtonClicked(View view){
-        saveImage = false;
-        //s3upload.Resume();
+        questionMotorActionPerformed = true;
     }
 
     @Override
@@ -267,8 +267,13 @@ public class MainActivity extends Activity
                 .execute(currentQuestion.ImageURI);
         ((TextView) findViewById(R.id.text_view)).setText(currentQuestion.QuestionHeading);
 
-        ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
-        ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
+        if(allQuestions.size() -1 == questionIterator){
+            ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
+            ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
+        }else {
+            ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
+            ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
+        }
         questionIterator++;
     }
 }
