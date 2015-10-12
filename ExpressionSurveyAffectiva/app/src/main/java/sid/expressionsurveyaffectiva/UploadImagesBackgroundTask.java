@@ -32,11 +32,15 @@ import java.util.concurrent.locks.ReentrantLock;
 public class UploadImagesBackgroundTask implements Runnable  {
 
     class FrameIOContainer{
-        public Frame frame;
         public String imageName;
+        public byte[] byteArray;
+        public int height;
+        public int width;
         public FrameIOContainer(Frame frame , String imageName){
-            this.frame = frame;
             this.imageName = imageName;
+            byteArray = ((Frame.ByteArrayFrame) frame).getByteArray().clone();
+            height = frame.getHeight();
+            width = frame.getWidth();
         }
     }
 
@@ -93,19 +97,18 @@ public class UploadImagesBackgroundTask implements Runnable  {
     }
 
     public void saveToDrive( FrameIOContainer itemToWork ) throws IOException {
-        int width = itemToWork.frame.getWidth();
-        int height = itemToWork.frame.getHeight();
+        int width = itemToWork.width;
+        int height = itemToWork.height;
 
         // Naming the file randomly
         //String dirPath =  ;//+ File.separator +  surveyImagesDeviceDirectory;
         File file = new File(DeviceDirectory+ File.separator + itemToWork.imageName);
         file.getParentFile().mkdirs();
-
         OutputStream fOut = new FileOutputStream(file);
         //TODO: Save file as Yuv instead of bitmap and converting to jpg
         //investigate how to rotate a Yuv image to make this optimization
         YuvImage img = new YuvImage(
-                ((Frame.ByteArrayFrame) itemToWork.frame).getByteArray(), ImageFormat.NV21 , width,height,null);
+                itemToWork.byteArray, ImageFormat.NV21 , width,height,null);
 
         //Rotating the image in each frame is slowing down the application a lot ..
         //Be content with the rotated image and adjust the visualization part (not cool though )
