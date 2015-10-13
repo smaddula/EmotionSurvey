@@ -19,6 +19,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
@@ -43,6 +44,7 @@ public class Util {
     private static AmazonS3Client sS3Client;
     private static CognitoCachingCredentialsProvider sCredProvider;
     private static TransferUtility sTransferUtility;
+    private static TransferManager sTransferManager;
 
     /**
      * Gets an instance of CognitoCachingCredentialsProvider which is
@@ -89,6 +91,22 @@ public class Util {
         }
 
         return sTransferUtility;
+    }
+
+
+    /**
+     * Gets an instance of the TransferUtility which is constructed using the
+     * given Context
+     *
+     * @param context
+     * @return a TransferUtility instance
+     */
+    public static TransferManager getTransferManager(Context context) {
+        if (sTransferManager == null) {
+            sTransferManager = new TransferManager(getCredProvider(context) );
+        }
+
+        return sTransferManager;
     }
 
     /**

@@ -14,12 +14,14 @@ import java.io.InputStream;
 
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;
+    IDownloadedImageEvent imageDownloadedEvent;
 
-    public DownloadImageTask(ImageView bmImage) {
+    public DownloadImageTask(IDownloadedImageEvent imagedDownloadedEvent ,ImageView bmImage) {
         this.bmImage = bmImage;
+        this.imageDownloadedEvent = imagedDownloadedEvent;
     }
 
-    protected Bitmap doInBackground(String... urls) {
+    protected Bitmap doInBackground(  String... urls) {
         String urldisplay = urls[0];
         Bitmap mIcon11 = null;
         try {
@@ -33,6 +35,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected void onPostExecute(Bitmap result) {
+        imageDownloadedEvent.callback();
         bmImage.setImageBitmap(result);
     }
 }

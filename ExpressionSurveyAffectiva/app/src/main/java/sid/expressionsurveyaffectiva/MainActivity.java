@@ -1,25 +1,14 @@
 package sid.expressionsurveyaffectiva;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
-import android.opengl.Visibility;
-import android.os.Environment;
 import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
@@ -52,6 +41,7 @@ import sid.UserSurveyData.FullSurveyData;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
+    boolean firstImageLoaded = false;
     long lastImageSavedMillisecond = 0;
     int questionIterator;
     int numberOfFilesUploaded = 0;
@@ -64,7 +54,7 @@ public class MainActivity extends Activity
     UploadImagesBackgroundTask s3upload ;
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
-    Question currentQuestion;
+    Question currentQuestion = null;
     RadioGroup valenceRadioGroup ;
     LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer;
     ProgressBar uploadProgressBar;
@@ -92,6 +82,10 @@ public class MainActivity extends Activity
 
     @Override
     public void onImageResults(List<Face> faces, Frame image, float timeStamp) {
+
+        if(currentQuestion == null)
+            return;
+
         if (faces == null) {
             //Log.v(LOG_TAG, "Got unprocessed frame");
             return;
@@ -104,7 +98,7 @@ public class MainActivity extends Activity
 
         String UserFaceImageName = "";
         long currentMillisecond = System.currentTimeMillis();
-        if (!questionMotorActionPerformed && currentMillisecond - lastImageSavedMillisecond > 200) {
+        if ( !questionMotorActionPerformed && currentMillisecond - lastImageSavedMillisecond > 200) {
             //Try saving image every 500 millisecond
             lastImageSavedMillisecond = currentMillisecond;
 
@@ -114,6 +108,7 @@ public class MainActivity extends Activity
         }
 
         Face face = faces.get(0);
+
         userData.AddFrameData(currentQuestion, new FrameInformation( face , UserFaceImageName , questionMotorActionPerformed ));
     }
 
@@ -138,7 +133,7 @@ public class MainActivity extends Activity
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
 
-        s3upload = new UploadImagesBackgroundTask( new IEvent() {
+        s3upload = new UploadImagesBackgroundTask( new IUploadedImageEvent() {
             @Override
             public void callback(int completedUploads) {
                 numberOfFilesUploaded = completedUploads;
@@ -199,8 +194,7 @@ public class MainActivity extends Activity
     public void loadNextQuestion( View view ){
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
-        questionMotorActionPerformed = false;
-        FinishServingQuestion();
+
         loadData();
     }
 
@@ -260,20 +254,31 @@ public class MainActivity extends Activity
     public void loadData(  ) {
         if (allQuestions.size() == 0)
             return;
-        currentQuestion = allQuestions.get(questionIterator);
         ImageView imageView = ((ImageView) findViewById(R.id.image));
 
-        new DownloadImageTask(imageView)
-                .execute(currentQuestion.ImageURI);
-        ((TextView) findViewById(R.id.text_view)).setText(currentQuestion.QuestionHeading);
+        new DownloadImageTask(new IDownloadedImageEvent() {
+                @Override
+                public void callback() {
+                    questionMotorActionPerformed = false;
+                    if(questionIterator!=0)
+                        FinishServingQuestion();
+                    currentQuestion = allQuestions.get(questionIterator);
+                    ((TextView) findViewById(R.id.text_view)).setText(currentQuestion.QuestionHeading);
 
-        if(allQuestions.size() -1 == questionIterator){
-            ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
-            ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
-        }else {
-            ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
-            ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
-        }
-        questionIterator++;
+
+                    if(allQuestions.size() -1 == questionIterator){
+                        ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
+                        ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
+                    }else {
+                        ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
+                        ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
+                    }
+
+                    questionIterator++;
+                }
+            }
+            , imageView)
+                .execute(allQuestions.get(questionIterator).ImageURI);
+
     }
 }

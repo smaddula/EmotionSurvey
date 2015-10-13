@@ -9,6 +9,7 @@ var data = [];
 var s3BucketURL ;
 var QuestionInfo = [];
 
+var tooltipDiv;
 var svg;
 var line;
 var color;
@@ -134,7 +135,7 @@ function D3MultiLineChart (RawData) {
 
 
     // Define 'div' for tooltips
-    var div = d3.select("body")
+    tooltipDiv = d3.select("body")
         .append("div")  // declare the tooltip div
         .attr("class", "tooltip")              // apply the 'tooltip' class
         .style("opacity", 0);
@@ -203,11 +204,11 @@ function D3MultiLineChart (RawData) {
                     } )
                     .style("pointer-events", "none");
 
-                div
+                tooltipDiv
                     .style("opacity", 1)
                     .style("pointer-events", "none");;
 
-                div	.html(
+                tooltipDiv	.html(
                     d.userCameraImagePath != "" ?
                     '<img class="RotateImage" height = "90" width = "140"  src = "' + s3BucketURL + d.userCameraImagePath +'">' : ""
                 )
@@ -215,7 +216,7 @@ function D3MultiLineChart (RawData) {
                     .style("top", (d3.event.pageY - 28) + "px");
             }else{
                 console.log("out of the small circle")
-                div
+                tooltipDiv
                     .style("opacity", 0);
                 svg.selectAll(".tooltipLine").transition().duration(100).attr("stroke","gray").transition().duration(100).remove()
 
@@ -309,7 +310,7 @@ function ClickedQuestionImage (d){
 };
 
 function BoundingBoxClicked(d) {
-    div
+    tooltipDiv
         .style("opacity", 0);
     svg.selectAll(".tooltipLine").remove()
 
@@ -338,7 +339,7 @@ function BoundingBoxClicked(d) {
 };
 function resetAxisZoom() {
 
-    div.style("opacity", 0);
+    tooltipDiv.style("opacity", 0);
     svg.selectAll(".tooltipLine").remove()
 
 

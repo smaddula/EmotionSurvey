@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.util.Log;
 
 import com.affectiva.android.affdex.sdk.Frame;
 import com.affectiva.android.affdex.sdk.detector.Face;
@@ -46,23 +47,26 @@ public class UploadImagesBackgroundTask implements Runnable  {
 
     private boolean isSurveyComplete = false;
     protected BlockingQueue<FrameIOContainer> queue;
+    private TransferManager transferManager;
     private TransferUtility transferUtility;
     private Semaphore semaphore = new Semaphore(1,true);
 
-    private IEvent ImageUploaded;
+    private IUploadedImageEvent ImageUploaded;
     private String uploadPath;
     private String DeviceDirectory;
     private int uploadsCompleted = 0;
     private int uploadRequests = 0;
 
-    public UploadImagesBackgroundTask( IEvent imageUploaded ,Context context , String deviceDirectory , String s3Directory ){
+    public UploadImagesBackgroundTask( IUploadedImageEvent imageUploaded ,Context context , String deviceDirectory , String s3Directory ){
         this.queue = new LinkedBlockingQueue<FrameIOContainer>() ;
         ImageUploaded = imageUploaded;
         transferUtility = Util.getTransferUtility(context);
+        transferManager = Util.getTransferManager(context);
         uploadPath = s3Directory;
         DeviceDirectory = deviceDirectory;
     }
 
+    long endTime;
     public void run() {
 
         FrameIOContainer itemToWork;
@@ -76,9 +80,14 @@ public class UploadImagesBackgroundTask implements Runnable  {
                 continue;
             }
             try {
+                long startTime = System.nanoTime();
                 itemToWork = queue.take();
                 saveToDrive(itemToWork);
+                long savedtoFileTime = System.nanoTime();
                 saveToS3(itemToWork);
+                endTime = System.nanoTime();
+                Log.d("SaveUpload SaveFile" , Long.toString ((savedtoFileTime-startTime)/1000000) +" "+ itemToWork.imageName );
+                Log.d("SaveUpload S3UploadCall" , Long.toString ((endTime-savedtoFileTime)/1000000) + " " + itemToWork.imageName );
             } catch (InterruptedException e) {
                 semaphore.release();
                 e.printStackTrace();
@@ -110,32 +119,6 @@ public class UploadImagesBackgroundTask implements Runnable  {
         YuvImage img = new YuvImage(
                 itemToWork.byteArray, ImageFormat.NV21 , width,height,null);
 
-        //Rotating the image in each frame is slowing down the application a lot ..
-        //Be content with the rotated image and adjust the visualization part (not cool though )
-        //Write another program that edits the files stored in S3 - batch script every night ?
-
-
-        /*ByteArrayOutputStream out = new ByteArrayOutputStream();
-        img.compressToJpeg(new Rect(0,0,width,height),100,out);
-        byte[] imageBytes = out.toByteArray();
-        Bitmap bitmapImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-        switch (itemToWork.frame.getTargetRotation()) {
-            case BY_90_CCW:
-                bitmapImage = Frame.rotateImage(bitmapImage,-90);
-                break;
-            case BY_90_CW:
-                bitmapImage = Frame.rotateImage(bitmapImage,90);
-                break;
-            case BY_180:
-                bitmapImage = Frame.rotateImage(bitmapImage,180);
-                break;
-            default:
-                //keep bitmap as it is
-        }*/
-
-        //bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
-
         img.compressToJpeg( new Rect( 0,0,img.getWidth(),img.getHeight() ) , 100,fOut);
         fOut.flush();
         fOut.close();
@@ -144,15 +127,20 @@ public class UploadImagesBackgroundTask implements Runnable  {
 
     public void saveToS3(FrameIOContainer itemToWork){
 
-        File file = new File(DeviceDirectory+File.separator+itemToWork.imageName);
+        final File file = new File(DeviceDirectory+File.separator+itemToWork.imageName);
         TransferObserver transferObserver= transferUtility.upload(Util.BUCKET_NAME, uploadPath+File.separator+file.getName(),file);
         transferObserver.setTransferListener(
                 new TransferListener() {
                     @Override
                     public void onStateChanged(int i, TransferState transferState) {
-                        semaphore.release();
-                        if (transferState == TransferState.COMPLETED) {
+                        if(transferState == TransferState.IN_PROGRESS)
+                            return;
+
+                        if (transferState == TransferState.COMPLETED || transferState == TransferState.CANCELED || transferState == TransferState.FAILED) {
+                            //ignore all the failed uploads .. no need to be perfect here
+                            semaphore.release();
                             uploadsCompleted++;
+                            Log.d("SaveUpload UploadedFile", Long.toString((System.nanoTime() - endTime) / 1000000) + " " + file.getName() + " " + transferState.toString());
                             if(isSurveyComplete || uploadsCompleted == uploadRequests )
                             //let the main thread know that a image got uploaded
                                 ImageUploaded.callback(uploadsCompleted);
@@ -180,6 +168,8 @@ public class UploadImagesBackgroundTask implements Runnable  {
 
     public void surveyComplete(){
         isSurveyComplete = true;
+        //Increase number of threads by 5
+        semaphore.release(5);
     }
 
 }
