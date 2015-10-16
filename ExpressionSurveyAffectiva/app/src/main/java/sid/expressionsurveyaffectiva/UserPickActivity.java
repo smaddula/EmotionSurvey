@@ -13,10 +13,13 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import java.util.List;
 
 public class UserPickActivity extends Activity {
 
@@ -55,14 +58,46 @@ public class UserPickActivity extends Activity {
     }
 
     public void onStartSurveyClick(View view){
-        Intent intent = new Intent(UserPickActivity.this,
-                MainActivity.class);
-        startActivity(intent);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Survey");
+        query.whereEqualTo("isTestSurvey",false);
+        query.whereEqualTo("isValid",true);
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
+                if (e == null) {
+                    String surveyId = objectList.get(0).getObjectId();
+                    Intent intent = new Intent(UserPickActivity.this,
+                            MainActivity.class);
+                    intent.putExtra("SurveyId", surveyId);
+                    intent.putExtra("isTestSurvey", false);
+                    startActivity(intent);
+                } else {
+                    // something went wrong
+                }
+            }
+        });
     }
 
     public void onPracticeSurveyClick(View view){
-        Intent intent = new Intent(UserPickActivity.this,
-                MainActivity.class);
-        startActivity(intent);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Survey");
+        query.whereEqualTo("isTestSurvey",true);
+        query.whereEqualTo("isValid",true);
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
+                if (e == null) {
+                    String surveyId = objectList.get(0).getObjectId();
+                    Intent intent = new Intent(UserPickActivity.this,
+                            MainActivity.class);
+                    intent.putExtra("SurveyId", surveyId);
+                    intent.putExtra("isTestSurvey", true);
+                    startActivity(intent);
+                } else {
+                    // something went wrong
+                }
+            }
+        });
     }
 }

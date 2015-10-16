@@ -30,6 +30,7 @@ import com.affectiva.android.affdex.sdk.detector.Face;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -155,7 +156,7 @@ public class MainActivity extends Activity
         // that view will be painted with what the camera sees.
 
         detector = new CameraDetector(this, CameraDetector.CameraType.CAMERA_FRONT, cameraPreview);
-        detector.setLicensePath("sdk_kusuma.chunduru@gmail.com.license");
+        detector.setLicensePath("sdk_parisa.rashidi@ufl.edu.license");
         detector.setMaxProcessRate(20);
         detector.setImageListener(this);
         detector.setFaceListener(this);
@@ -164,14 +165,28 @@ public class MainActivity extends Activity
 
         detector.start();
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Question");
+        String surveyId = getIntent().getStringExtra("SurveyId");
+
+        ParseQuery<ParseObject> innerquery = ParseQuery.getQuery("Survey");
+        innerquery.whereEqualTo("objectId",surveyId);
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyQuestions");
+        query.whereMatchesQuery("SurveyId",innerquery);
+
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objectList, com.parse.ParseException e) {
                 if (e == null) {
                     // object will be your game score
+                    ParseObject questionObj;
                     for (ParseObject obj : objectList) {
-                        allQuestions.add(new Question(obj.getString("ImageURI"), obj.getString("Title"),obj));
+                        try {
+                            questionObj = obj.getParseObject("QuestionId");
+                            questionObj.fetchIfNeeded();
+                            allQuestions.add(new Question(questionObj.getString("ImageURI"), questionObj.getString("Title"), questionObj));
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
                     }
                     loadData();
                 } else {
