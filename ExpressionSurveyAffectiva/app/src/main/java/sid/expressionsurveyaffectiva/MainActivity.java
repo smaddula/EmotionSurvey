@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
@@ -35,6 +37,7 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import sid.UserSurveyData.FrameInformation;
 import sid.UserSurveyData.FullSurveyData;
@@ -42,11 +45,14 @@ import sid.UserSurveyData.FullSurveyData;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
-    boolean firstImageLoaded = false;
-    long lastImageSavedMillisecond = 0;
+    boolean savedDataToParse = false;
+    boolean switchedIntent = false;
+    long lastImageSavedNano = 0;
     int questionIterator;
     int numberOfFilesUploaded = 0;
     int numberOfFilesToUpload = 0 ;
+    HashMap<Question,Integer> imagesSavedPerQuestion;
+    int maxImagesPerQuestion = 6;
     boolean surveyComplete = false;
     String surveyImagesDeviceDirectory ;
     String SurveyImagesS3Directory ;
@@ -56,9 +62,11 @@ public class MainActivity extends Activity
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion = null;
-    RadioGroup valenceRadioGroup ;
+    RadioGroup valenceRadioGroup , intensityRadioGroup ;
     LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer;
     ProgressBar uploadProgressBar;
+
+    RadioButton verySmallIntensity , smallIntensity , mediumIntensity , largeIntensity,veryLargeIntensity;
 
     private SurfaceView cameraPreview;
     private CameraDetector detector;
@@ -81,36 +89,30 @@ public class MainActivity extends Activity
         return;
     }
 
-    @Override
-    public void onImageResults(List<Face> faces, Frame image, float timeStamp) {
 
-        if(currentQuestion == null)
-            return;
+    public boolean isIntensitySelected()
+    {
+        return verySmallIntensity.isChecked()||smallIntensity.isChecked()||mediumIntensity.isChecked()||largeIntensity.isChecked()||veryLargeIntensity.isChecked();
+    }
 
-        if (faces == null) {
-            //Log.v(LOG_TAG, "Got unprocessed frame");
-            return;
-        }
-        if (faces.size() == 0) {
-            //Log.v(LOG_TAG, "No face found");
-            return;
-        }
-        //TODO:If saving is slowing the frame rate use a ThreadPool and move the saving logic to a different class
+    public RadioButton getIntensitySelected()
+    {
 
-        String UserFaceImageName = "";
-        long currentMillisecond = System.currentTimeMillis();
-        if ( !questionMotorActionPerformed && currentMillisecond - lastImageSavedMillisecond > 200) {
-            //Try saving image every 500 millisecond
-            lastImageSavedMillisecond = currentMillisecond;
+        if(verySmallIntensity.isChecked())
+            return verySmallIntensity;
+        if(smallIntensity.isChecked())
+            return smallIntensity;
+        if(mediumIntensity.isChecked())
+            return mediumIntensity;
+        if(largeIntensity.isChecked())
+            return largeIntensity;
+        if(veryLargeIntensity.isChecked())
+            return veryLargeIntensity;
+        return null;
+    }
 
-            UserFaceImageName = Long.toString(System.nanoTime()) + ".jpg";
-            numberOfFilesToUpload++;
-            s3upload.push(image, UserFaceImageName);
-        }
-
-        Face face = faces.get(0);
-
-        userData.AddFrameData(currentQuestion, new FrameInformation( face , UserFaceImageName , questionMotorActionPerformed ));
+    public void clearIntensitySelections(){
+        intensityRadioGroup.clearCheck();
     }
 
     @Override
@@ -126,6 +128,8 @@ public class MainActivity extends Activity
 
         userData = new FullSurveyData("https://s3.amazonaws.com/surveyfacesnaps/"+SurveyImagesS3Directory+"/");
 
+        imagesSavedPerQuestion = new HashMap<Question,Integer>();
+
         surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
         uploadProgressBarContainer = (LinearLayout)findViewById(R.id.layoutUploadProgress);
@@ -133,6 +137,13 @@ public class MainActivity extends Activity
 
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
+        intensityRadioGroup = (RadioGroup) findViewById(R.id.intensityRadioGroup);
+
+        verySmallIntensity = (RadioButton)findViewById(R.id.intensity_verysmall);
+        smallIntensity = (RadioButton)findViewById(R.id.intensity_small);
+        mediumIntensity = (RadioButton)findViewById(R.id.intensity_medium);
+        largeIntensity = (RadioButton)findViewById(R.id.intensity_large);
+        veryLargeIntensity = (RadioButton)findViewById(R.id.intensity_verylarge);
 
         s3upload = new UploadImagesBackgroundTask( new IUploadedImageEvent() {
             @Override
@@ -197,11 +208,59 @@ public class MainActivity extends Activity
 
     }
 
+
+    @Override
+    public void onImageResults(List<Face> faces, Frame image, float timeStamp) {
+
+        if(currentQuestion == null)
+            return;
+
+        if (faces == null) {
+            //Log.v(LOG_TAG, "Got unprocessed frame");
+            return;
+        }
+        if (faces.size() == 0) {
+            //Log.v(LOG_TAG, "No face found");
+            return;
+        }
+        //TODO:If saving is slowing the frame rate use a ThreadPool and move the saving logic to a different class
+
+        String UserFaceImageName = "";
+        long currentNanosecond = System.nanoTime();
+        if(!imagesSavedPerQuestion.containsKey( currentQuestion))
+            imagesSavedPerQuestion.put(currentQuestion,0);
+        if(allQuestions.size()>0 && !questionMotorActionPerformed){
+            if(currentNanosecond - lastImageSavedNano <= 400*1000000)
+                Log.d("skipped saving image","Not saving image since we have saved an imaged very recently");
+        }else{
+            if(imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)>=0)
+                Log.d("skipped saving image","Not saving image since we have already saved " + Integer.toString( maxImagesPerQuestion)+" images for this question");
+        }
+        if ( imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)<0 && allQuestions.size()>0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400*1000000) {
+            //Try saving image every 500 millisecond
+            lastImageSavedNano = currentNanosecond;
+
+            imagesSavedPerQuestion.put(currentQuestion,imagesSavedPerQuestion.get(currentQuestion)+1);
+
+            UserFaceImageName = Long.toString(System.nanoTime()) + ".jpg";
+            numberOfFilesToUpload++;
+            s3upload.push(image, UserFaceImageName);
+        }
+
+        Face face = faces.get(0);
+
+        userData.AddFrameData(currentQuestion, new FrameInformation(face, UserFaceImageName, questionMotorActionPerformed));
+    }
+
+
     public void FinishServingQuestion(){
-        RadioButton rb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
-        userData.setUserInput(Integer.parseInt(rb.getTag().toString()));
-        if(!surveyComplete)
+        RadioButton valencerb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
+        RadioButton intensityrb = getIntensitySelected();
+        userData.setUserInput(Integer.parseInt(valencerb.getTag().toString()), Integer.parseInt(intensityrb.getTag().toString()));
+        if(!surveyComplete) {
             valenceRadioGroup.clearCheck();
+            intensityRadioGroup.clearCheck();
+        }
         else
             userData.DoneSurvey();
     }
@@ -210,10 +269,14 @@ public class MainActivity extends Activity
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
 
+        if(!isIntensitySelected())
+            return;
+
         loadData();
     }
 
     public void onRadioButtonClicked(View view){
+
         questionMotorActionPerformed = true;
     }
 
@@ -225,45 +288,62 @@ public class MainActivity extends Activity
     public void SaveData(View view) throws IOException, com.parse.ParseException {
         detector.stop();
         surveyComplete = true;
-        s3upload.surveyComplete();
         FinishServingQuestion();
-        String result = gson.toJson(userData);
         ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
-        emotionFrameData.save();
+        emotionFrameData.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
 
-        ParseObject userSurvey = new ParseObject("SurveyData");
-        userSurvey.put("UserID", ParseUser.getCurrentUser());
-        userSurvey.put("JsonEmotionData", emotionFrameData);
-        userSurvey.save();
+                    ParseObject userSurvey = new ParseObject("SurveyData");
+                    userSurvey.put("UserID", ParseUser.getCurrentUser());
+                    userSurvey.put("JsonEmotionData", this);
+                    try {
+                        userSurvey.save();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    savedDataToParse = true;
+                    if(numberOfFilesToUpload == numberOfFilesUploaded){
+                        uploadComplete();
+                    }
+                }
 
+            }
+        });
+
+
+        s3upload.surveyComplete();
         uploadProgressBarContainer.setVisibility(View.VISIBLE);
         footerButtonsContainer.setVisibility(View.GONE);
 
         uploadProgressBar.setMax(numberOfFilesToUpload);
-        if(numberOfFilesToUpload == numberOfFilesUploaded){
+        if(numberOfFilesToUpload == numberOfFilesUploaded && savedDataToParse){
             uploadComplete();
         }
     }
 
-    public void uploadComplete(){
+    public void uploadComplete() {
 
-        //Delete the local directory
-        /*File dir = new File(surveyImagesDeviceDirectory);
-        if (dir.isDirectory())
-        {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++)
-            {
-                new File(dir, children[i]).delete();
+
+        if (savedDataToParse) {
+            //Delete the local directory
+            File dir = new File(surveyImagesDeviceDirectory);
+            if (dir.isDirectory()) {
+                String[] children = dir.list();
+                for (int i = 0; i < children.length; i++) {
+                    new File(dir, children[i]).delete();
+                }
+                dir.delete();
             }
-            dir.delete();
-        }*/
 
-        //switch to a different view
-        Intent intent = new Intent(MainActivity.this,
-                UserPickActivity.class);
-        startActivity(intent);
-        finish();
+
+            //switch to a different view
+            Intent intent = new Intent(MainActivity.this,
+                    UserPickActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     public void loadData(  ) {

@@ -15,6 +15,7 @@ public class UserQuestionData {
     public Date motorActionPerformed;
     public String imageURI;
     public int valenceUserInput;
+    public int intensityUserInput;
     public List<TimeStampFrameInformationPair> frameData;
     public UserQuestionData(String quetionid, String imageuri){
         QuestionObjectId = quetionid;

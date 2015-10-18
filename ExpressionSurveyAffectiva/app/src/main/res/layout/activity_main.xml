@@ -56,30 +56,66 @@
                 </RadioGroup>
 
             </LinearLayout>
-
             <LinearLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/button2"
-                    android:gravity="center"
+                <RadioGroup android:id="@+id/intensityRadioGroup" android:orientation="horizontal" android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Interesting" />
+                    android:layout_height="wrap_content" android:onClick="onRadioButtonClicked">
+                    <FrameLayout
+                        android:layout_width="0dip"
+                        android:layout_gravity="bottom" android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="30">
+                        <RadioButton android:id="@+id/intensity_verysmall" android:button="@drawable/radiobutton_selector_smiley_lowestintensity"  android:tag="1"
+                            android:layout_gravity="center" android:alpha="0.6"
+                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
+                    </FrameLayout>
 
-                <Button
-                    android:id="@+id/button4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:text="Angry" />
+                    <FrameLayout
+                        android:layout_width="0dip"
+                        android:layout_gravity="bottom" android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="30">
+                        <RadioButton android:id="@+id/intensity_small"  android:button="@drawable/radiobutton_selector_smiley_lowintensity" android:tag="2"
+                            android:layout_gravity="center" android:alpha="0.7"
+                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="0dip"
+                        android:layout_gravity="bottom" android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="35">
+                        <RadioButton android:id="@+id/intensity_medium"  android:button="@drawable/radiobutton_selector_smiley_mediumintensity" android:tag="3"
+                            android:layout_gravity="center" android:alpha="0.8"
+                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:layout_width="0dip"
+                        android:layout_gravity="bottom" android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="40">
+                        <RadioButton android:id="@+id/intensity_large"  android:button="@drawable/radiobutton_selector_smiley_highintensity" android:tag="4"
+                            android:layout_gravity="center" android:alpha="0.9"
+                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="0dip"
+                        android:layout_gravity="bottom" android:gravity="center"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="40">
+                        <RadioButton android:id="@+id/intensity_verylarge"  android:button="@drawable/radiobutton_selector_smiley_highestintensity" android:tag="5"
+                            android:layout_gravity="center"
+                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
+                    </FrameLayout>
+                </RadioGroup>
 
             </LinearLayout>
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

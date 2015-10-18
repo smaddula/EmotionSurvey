@@ -26,8 +26,9 @@ public class FullSurveyData {
         }
     }
 
-    public void setUserInput(int valenceUserInput){
+    public void setUserInput(int valenceUserInput, int intensityUserInput){
         currentUserQuestionData.valenceUserInput = valenceUserInput;
+        currentUserQuestionData.intensityUserInput = intensityUserInput;
     }
 
     public FullSurveyData(String imagesPath){

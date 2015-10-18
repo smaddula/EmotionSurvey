@@ -86,8 +86,8 @@ public class UploadImagesBackgroundTask implements Runnable  {
                 long savedtoFileTime = System.nanoTime();
                 saveToS3(itemToWork);
                 endTime = System.nanoTime();
-                Log.d("SaveUpload SaveFile" , Long.toString ((savedtoFileTime-startTime)/1000000) +" "+ itemToWork.imageName );
-                Log.d("SaveUpload S3UploadCall" , Long.toString ((endTime-savedtoFileTime)/1000000) + " " + itemToWork.imageName );
+                Log.d("Image SaveImage" , Long.toString ((savedtoFileTime-startTime)/1000000) +" "+ itemToWork.imageName );
+                Log.d("Image S3UploadCall" , Long.toString ((endTime-savedtoFileTime)/1000000) + " " + itemToWork.imageName );
             } catch (InterruptedException e) {
                 semaphore.release();
                 e.printStackTrace();
@@ -128,7 +128,8 @@ public class UploadImagesBackgroundTask implements Runnable  {
     public void saveToS3(FrameIOContainer itemToWork){
 
         final File file = new File(DeviceDirectory+File.separator+itemToWork.imageName);
-        TransferObserver transferObserver= transferUtility.upload(Util.BUCKET_NAME, uploadPath+File.separator+file.getName(),file);
+        final TransferObserver transferObserver= transferUtility.upload(Util.BUCKET_NAME, uploadPath+File.separator+file.getName(),file);
+
         transferObserver.setTransferListener(
                 new TransferListener() {
                     @Override
@@ -137,6 +138,9 @@ public class UploadImagesBackgroundTask implements Runnable  {
                             return;
 
                         if (transferState == TransferState.COMPLETED || transferState == TransferState.CANCELED || transferState == TransferState.FAILED) {
+
+                            if(transferState == TransferState.CANCELED || transferState == TransferState.FAILED)
+                                Log.d("Image Failed Saving","Upload Image Failed");
                             //ignore all the failed uploads .. no need to be perfect here
                             semaphore.release();
                             uploadsCompleted++;

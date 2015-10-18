@@ -432,7 +432,9 @@ color.domain(d3.keys(data[0].score));
 		.transition()
 		.attr("d", function(d) { return line(d.values); })
 		
-		svg.selectAll("rect.BoundryLine").remove
+		svg.selectAll("rect.BoundryLine").remove;
+		d3.selectAll(".selected").classed("selected",!isSelected);
+		d3.selectAll(".BoundryLine").remove();
 		
 	}
 	
