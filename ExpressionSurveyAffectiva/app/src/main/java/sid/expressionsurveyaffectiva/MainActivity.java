@@ -47,6 +47,7 @@ public class MainActivity extends Activity
 {
     boolean savedDataToParse = false;
     boolean switchedIntent = false;
+    boolean isTestSurvey = false;
     long lastImageSavedNano = 0;
     int questionIterator;
     int numberOfFilesUploaded = 0;
@@ -112,7 +113,11 @@ public class MainActivity extends Activity
     }
 
     public void clearIntensitySelections(){
-        intensityRadioGroup.clearCheck();
+        verySmallIntensity.setChecked(false);
+        smallIntensity.setChecked(false);
+        mediumIntensity.setChecked(false);
+        largeIntensity.setChecked(false);
+        veryLargeIntensity.setChecked(false);
     }
 
     @Override
@@ -145,21 +150,25 @@ public class MainActivity extends Activity
         largeIntensity = (RadioButton)findViewById(R.id.intensity_large);
         veryLargeIntensity = (RadioButton)findViewById(R.id.intensity_verylarge);
 
-        s3upload = new UploadImagesBackgroundTask( new IUploadedImageEvent() {
-            @Override
-            public void callback(int completedUploads) {
-                numberOfFilesUploaded = completedUploads;
-                uploadProgressBar.setMax(numberOfFilesToUpload);
-                uploadProgressBar.setProgress(numberOfFilesUploaded);
-                if(numberOfFilesUploaded == numberOfFilesToUpload && surveyComplete ){
-                    uploadComplete();
+        isTestSurvey =  getIntent().getBooleanExtra("isTestSurvey",false);
+
+        if(!isTestSurvey) {
+
+            s3upload = new UploadImagesBackgroundTask(new IUploadedImageEvent() {
+                @Override
+                public void callback(int completedUploads) {
+                    numberOfFilesUploaded = completedUploads;
+                    uploadProgressBar.setMax(numberOfFilesToUpload);
+                    uploadProgressBar.setProgress(numberOfFilesUploaded);
+                    if (numberOfFilesUploaded == numberOfFilesToUpload && surveyComplete) {
+                        uploadComplete();
+                    }
                 }
-            }
-        } , this , surveyImagesDeviceDirectory , SurveyImagesS3Directory );
+            }, this, surveyImagesDeviceDirectory, SurveyImagesS3Directory);
 
-        Thread uploaderThread = new Thread(s3upload);
-        uploaderThread.start();
-
+            Thread uploaderThread = new Thread(s3upload);
+            uploaderThread.start();
+        }
         questionIterator = 0 ;
         cameraPreview = (SurfaceView) findViewById(R.id.cameraId);
         // Put the SDK in camera mode by using this constructor. The SDK will be in control of
@@ -236,7 +245,7 @@ public class MainActivity extends Activity
             if(imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)>=0)
                 Log.d("skipped saving image","Not saving image since we have already saved " + Integer.toString( maxImagesPerQuestion)+" images for this question");
         }
-        if ( imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)<0 && allQuestions.size()>0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400*1000000) {
+        if ( !isTestSurvey && imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)<0 && allQuestions.size()>0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400*1000000) {
             //Try saving image every 500 millisecond
             lastImageSavedNano = currentNanosecond;
 
@@ -259,7 +268,7 @@ public class MainActivity extends Activity
         userData.setUserInput(Integer.parseInt(valencerb.getTag().toString()), Integer.parseInt(intensityrb.getTag().toString()));
         if(!surveyComplete) {
             valenceRadioGroup.clearCheck();
-            intensityRadioGroup.clearCheck();
+            clearIntensitySelections();
         }
         else
             userData.DoneSurvey();
@@ -289,7 +298,11 @@ public class MainActivity extends Activity
         detector.stop();
         surveyComplete = true;
         FinishServingQuestion();
-        ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
+        if(isTestSurvey){
+            uploadComplete();
+            return;
+        }
+        final ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
         emotionFrameData.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -297,7 +310,7 @@ public class MainActivity extends Activity
 
                     ParseObject userSurvey = new ParseObject("SurveyData");
                     userSurvey.put("UserID", ParseUser.getCurrentUser());
-                    userSurvey.put("JsonEmotionData", this);
+                    userSurvey.put("JsonEmotionData", emotionFrameData);
                     try {
                         userSurvey.save();
                     } catch (ParseException e1) {
@@ -326,7 +339,7 @@ public class MainActivity extends Activity
     public void uploadComplete() {
 
 
-        if (savedDataToParse) {
+        if ( isTestSurvey || savedDataToParse) {
             //Delete the local directory
             File dir = new File(surveyImagesDeviceDirectory);
             if (dir.isDirectory()) {

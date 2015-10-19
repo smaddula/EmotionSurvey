@@ -47,7 +47,6 @@ public class UploadImagesBackgroundTask implements Runnable  {
 
     private boolean isSurveyComplete = false;
     protected BlockingQueue<FrameIOContainer> queue;
-    private TransferManager transferManager;
     private TransferUtility transferUtility;
     private Semaphore semaphore = new Semaphore(1,true);
 
@@ -61,7 +60,6 @@ public class UploadImagesBackgroundTask implements Runnable  {
         this.queue = new LinkedBlockingQueue<FrameIOContainer>() ;
         ImageUploaded = imageUploaded;
         transferUtility = Util.getTransferUtility(context);
-        transferManager = Util.getTransferManager(context);
         uploadPath = s3Directory;
         DeviceDirectory = deviceDirectory;
     }
