@@ -343,10 +343,6 @@
         var x2 = d3.time.scale()
             .range([0, width]);
 
-        var xAxis2 = d3.svg.axis() // xAxis for brush slider
-            .scale(x2)
-            .orient("bottom");
-
         var height2 = 30;
         //for slider
         var context =
@@ -368,11 +364,6 @@
         var brush = d3.svg.brush() //for slider bar at the bottom
             .x(x2)
             .on("brush", brushed);
-
-        //context.append("g") // Create brushing xAxis
-        //  .attr("class", "x axis1")
-        //.attr("transform", "translate(0," + 30 + ")")
-        // .call(xAxis2);
 
         var contextArea = d3.svg.area() // Set attributes for area chart in brushing context graph
             .interpolate("monotone")
@@ -435,7 +426,6 @@
             })
             .on("click", function(d) {
 
-                //reset();
                 var isSelected = d3.select(this).classed("selected");
 
                 infoSVGDivs.selectAll("img,.selected")
@@ -451,7 +441,9 @@
 
                 if (!isSelected) {
 
-                    d3.select(this)
+					d3.selectAll(".BoundryLine").remove();
+                    
+					d3.select(this)
                         .attr("width", (width / QuestionInfo.length) * 1.5)
                         .attr("height", (width / QuestionInfo.length) * 1.5);
 
