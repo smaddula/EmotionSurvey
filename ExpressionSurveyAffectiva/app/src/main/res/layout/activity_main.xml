@@ -10,46 +10,37 @@
         android:layout_height="fill_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp" />
-
         <LinearLayout
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_gravity="center_horizontal|center_vertical">
+            android:id="@+id/imageContainer"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_weight="7"
+            android:minHeight="300dp">
 
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center" />
+                android:layout_height="fill_parent"/>
         </LinearLayout>
 
         <LinearLayout
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/GridLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:context=".GridLayoutActivity">
+            android:orientation="vertical">
 
-            <LinearLayout
-
+            <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/smileyLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                tools:context=".GridLayoutActivity">
+
 
                 <RadioGroup
                     android:id="@+id/valenceRadioGroup"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:onClick="onRadioButtonClicked"
                     android:orientation="horizontal">
 
@@ -94,18 +85,11 @@
                         android:tag="1"></RadioButton>
                 </RadioGroup>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
                 <RadioGroup
                     android:id="@+id/intensityRadioGroup"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
                     android:onClick="onRadioButtonClicked"
                     android:orientation="horizontal">
 
@@ -168,83 +152,74 @@
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1">
-
             <LinearLayout
                 android:id="@+id/surfaceViewContainer"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_gravity="center_horizontal">
+                android:gravity="center_horizontal">
 
                 <SurfaceView
                     android:id="@+id/cameraId"
-                    android:layout_width="50px"
-                    android:layout_height="50px" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:orientation="vertical">
-
-            <LinearLayout
-
-                android:id="@+id/layoutUploadProgress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <ProgressBar
-                    android:id="@+id/uploadProgressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="5dp"
-                    android:indeterminate="false" />
-
-                <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Uploading Data Progress" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/footerButtonContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/nextQuestion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:onClick="loadNextQuestion"
-                    android:text="Next" />
+                <LinearLayout
 
-                <Button
-                    android:id="@+id/lastQuestionSave"
+                    android:id="@+id/layoutUploadProgress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:onClick="SaveData"
-                    android:text="Save"
-                    android:visibility="gone" />
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:id="@+id/uploadProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginRight="5dp"
+                        android:indeterminate="false" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Uploading Data Progress" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/footerButtonContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/nextQuestion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:onClick="loadNextQuestion"
+                        android:text="Next" />
+
+                    <Button
+                        android:id="@+id/lastQuestionSave"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:onClick="SaveData"
+                        android:text="Save"
+                        android:visibility="gone" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -63,7 +63,7 @@ public class MainActivity extends Activity
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion = null;
     RadioGroup valenceRadioGroup , intensityRadioGroup ;
-    LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer;
+    LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer , ValenceIntensityRadioContainer, imageContainer ;
     ProgressBar uploadProgressBar;
 
     private SurfaceView cameraPreview;
@@ -73,16 +73,22 @@ public class MainActivity extends Activity
     @Override
     public void onFaceDetectionStarted() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
+            imageContainer.setVisibility(View.VISIBLE);
+            //surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
             cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
             footerButtonsContainer.setVisibility(View.VISIBLE);
+            ValenceIntensityRadioContainer.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
     public void onFaceDetectionStopped() {
         if(surfaceViewContainer!=null && footerButtonsContainer!=null){
-            cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            imageContainer.setVisibility(View.GONE);
+            //surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
+            cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
             footerButtonsContainer.setVisibility(View.GONE);
+            ValenceIntensityRadioContainer.setVisibility(View.GONE);
         }
         return;
     }
@@ -106,7 +112,8 @@ public class MainActivity extends Activity
         footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
         uploadProgressBarContainer = (LinearLayout)findViewById(R.id.layoutUploadProgress);
         uploadProgressBar = (ProgressBar)findViewById(R.id.uploadProgressBar);
-
+        ValenceIntensityRadioContainer = (LinearLayout)findViewById(R.id.smileyLayout);
+        imageContainer = (LinearLayout)findViewById(R.id.imageContainer);
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
         intensityRadioGroup = (RadioGroup) findViewById(R.id.intensityRadioGroup);
@@ -332,8 +339,6 @@ public class MainActivity extends Activity
                     if(questionIterator!=0)
                         FinishServingQuestion();
                     currentQuestion = allQuestions.get(questionIterator);
-                    ((TextView) findViewById(R.id.text_view)).setText(currentQuestion.QuestionHeading);
-
 
                     if(allQuestions.size() -1 == questionIterator){
                         ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
