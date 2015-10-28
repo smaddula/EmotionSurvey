@@ -46,7 +46,6 @@ public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener
 {
     boolean savedDataToParse = false;
-    boolean switchedIntent = false;
     boolean isTestSurvey = false;
     long lastImageSavedNano = 0;
     int questionIterator;
@@ -67,8 +66,6 @@ public class MainActivity extends Activity
     LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer;
     ProgressBar uploadProgressBar;
 
-    RadioButton verySmallIntensity , smallIntensity , mediumIntensity , largeIntensity,veryLargeIntensity;
-
     private SurfaceView cameraPreview;
     private CameraDetector detector;
 
@@ -88,36 +85,6 @@ public class MainActivity extends Activity
             footerButtonsContainer.setVisibility(View.GONE);
         }
         return;
-    }
-
-
-    public boolean isIntensitySelected()
-    {
-        return verySmallIntensity.isChecked()||smallIntensity.isChecked()||mediumIntensity.isChecked()||largeIntensity.isChecked()||veryLargeIntensity.isChecked();
-    }
-
-    public RadioButton getIntensitySelected()
-    {
-
-        if(verySmallIntensity.isChecked())
-            return verySmallIntensity;
-        if(smallIntensity.isChecked())
-            return smallIntensity;
-        if(mediumIntensity.isChecked())
-            return mediumIntensity;
-        if(largeIntensity.isChecked())
-            return largeIntensity;
-        if(veryLargeIntensity.isChecked())
-            return veryLargeIntensity;
-        return null;
-    }
-
-    public void clearIntensitySelections(){
-        verySmallIntensity.setChecked(false);
-        smallIntensity.setChecked(false);
-        mediumIntensity.setChecked(false);
-        largeIntensity.setChecked(false);
-        veryLargeIntensity.setChecked(false);
     }
 
     @Override
@@ -143,12 +110,6 @@ public class MainActivity extends Activity
 
         valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
         intensityRadioGroup = (RadioGroup) findViewById(R.id.intensityRadioGroup);
-
-        verySmallIntensity = (RadioButton)findViewById(R.id.intensity_verysmall);
-        smallIntensity = (RadioButton)findViewById(R.id.intensity_small);
-        mediumIntensity = (RadioButton)findViewById(R.id.intensity_medium);
-        largeIntensity = (RadioButton)findViewById(R.id.intensity_large);
-        veryLargeIntensity = (RadioButton)findViewById(R.id.intensity_verylarge);
 
         isTestSurvey =  getIntent().getBooleanExtra("isTestSurvey",false);
 
@@ -264,11 +225,11 @@ public class MainActivity extends Activity
 
     public void FinishServingQuestion(){
         RadioButton valencerb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
-        RadioButton intensityrb = getIntensitySelected();
+        RadioButton intensityrb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
         userData.setUserInput(Integer.parseInt(valencerb.getTag().toString()), Integer.parseInt(intensityrb.getTag().toString()));
         if(!surveyComplete) {
             valenceRadioGroup.clearCheck();
-            clearIntensitySelections();
+            intensityRadioGroup.clearCheck();
         }
         else
             userData.DoneSurvey();
@@ -278,7 +239,7 @@ public class MainActivity extends Activity
         if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
 
-        if(!isIntensitySelected())
+        if(intensityRadioGroup.getCheckedRadioButtonId() == -1)
             return;
 
         loadData();

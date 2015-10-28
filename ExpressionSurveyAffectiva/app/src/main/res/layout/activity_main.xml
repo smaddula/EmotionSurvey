@@ -1,161 +1,220 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:padding="5dp">
+
     <LinearLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="12dp"
-            />
+            android:layout_marginLeft="12dp" />
 
         <LinearLayout
             android:layout_width="300dp"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:layout_height="300dp">
+            android:layout_height="300dp"
+            android:layout_gravity="center_horizontal|center_vertical">
+
             <ImageView
-                android:layout_gravity="center"
                 android:id="@+id/image"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:layout_gravity="center" />
         </LinearLayout>
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/GridLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            tools:context=".GridLayoutActivity" >
+            tools:context=".GridLayoutActivity">
 
             <LinearLayout
 
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <RadioGroup android:id="@+id/valenceRadioGroup" android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1"
-                    android:layout_height="wrap_content" android:onClick="onRadioButtonClicked">
-                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_happiest" android:tag="5"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
-                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlehappy" android:tag="4"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
-                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_neutral" android:tag="3"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
-                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_littlesad" android:tag="2"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
-                    <RadioButton android:button="@drawable/radiobutton_selector_smiley_verysad" android:tag="1"
-                        android:layout_height="wrap_content" android:layout_width="0dp" android:layout_weight="1" android:onClick="onRadioButtonClicked"></RadioButton>
+
+                <RadioGroup
+                    android:id="@+id/valenceRadioGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="onRadioButtonClicked"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@drawable/radiobutton_selector_smiley_happiest"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="5"></RadioButton>
+
+                    <RadioButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@drawable/radiobutton_selector_smiley_littlehappy"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="4"></RadioButton>
+
+                    <RadioButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@drawable/radiobutton_selector_smiley_neutral"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="3"></RadioButton>
+
+                    <RadioButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@drawable/radiobutton_selector_smiley_littlesad"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="2"></RadioButton>
+
+                    <RadioButton
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@drawable/radiobutton_selector_smiley_verysad"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="1"></RadioButton>
                 </RadioGroup>
 
             </LinearLayout>
-            <LinearLayout
 
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal">
-                <RadioGroup android:id="@+id/intensityRadioGroup" android:orientation="horizontal" android:layout_width="0dp"
+
+                <RadioGroup
+                    android:id="@+id/intensityRadioGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content" android:onClick="onRadioButtonClicked">
-                    <FrameLayout
-                        android:layout_width="0dip"
-                        android:layout_gravity="bottom" android:gravity="center"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="30">
-                        <RadioButton android:id="@+id/intensity_verysmall" android:button="@drawable/radiobutton_selector_smiley_lowestintensity"  android:tag="1"
-                            android:layout_gravity="center" android:alpha="0.6"
-                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
-                    </FrameLayout>
+                    android:onClick="onRadioButtonClicked"
+                    android:orientation="horizontal">
 
-                    <FrameLayout
-                        android:layout_width="0dip"
-                        android:layout_gravity="bottom" android:gravity="center"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="30">
-                        <RadioButton android:id="@+id/intensity_small"  android:button="@drawable/radiobutton_selector_smiley_lowintensity" android:tag="2"
-                            android:layout_gravity="center" android:alpha="0.7"
-                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
-                    </FrameLayout>
-                    <FrameLayout
-                        android:layout_width="0dip"
-                        android:layout_gravity="bottom" android:gravity="center"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="35">
-                        <RadioButton android:id="@+id/intensity_medium"  android:button="@drawable/radiobutton_selector_smiley_mediumintensity" android:tag="3"
-                            android:layout_gravity="center" android:alpha="0.8"
-                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
-                    </FrameLayout>
 
-                    <FrameLayout
-                        android:layout_width="0dip"
-                        android:layout_gravity="bottom" android:gravity="center"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="40">
-                        <RadioButton android:id="@+id/intensity_large"  android:button="@drawable/radiobutton_selector_smiley_highintensity" android:tag="4"
-                            android:layout_gravity="center" android:alpha="0.9"
-                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
-                    </FrameLayout>
-                    <FrameLayout
-                        android:layout_width="0dip"
-                        android:layout_gravity="bottom" android:gravity="center"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="40">
-                        <RadioButton android:id="@+id/intensity_verylarge"  android:button="@drawable/radiobutton_selector_smiley_highestintensity" android:tag="5"
-                            android:layout_gravity="center"
-                            android:layout_height="wrap_content" android:layout_width="wrap_content" android:onClick="onRadioButtonClicked"></RadioButton>
-                    </FrameLayout>
+                    <RadioButton
+                        android:id="@+id/intensity_verysmall"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="30"
+                        android:alpha="0.6"
+                        android:button="@drawable/radiobutton_selector_smiley_lowestintensity"
+                        android:gravity="bottom"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="1"></RadioButton>
+
+                    <RadioButton
+                        android:id="@+id/intensity_small"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="30"
+                        android:alpha="0.7"
+                        android:button="@drawable/radiobutton_selector_smiley_lowintensity"
+                        android:gravity="bottom"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="2"></RadioButton>
+
+                    <RadioButton
+                        android:id="@+id/intensity_medium"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="35"
+                        android:alpha="0.8"
+                        android:button="@drawable/radiobutton_selector_smiley_mediumintensity"
+                        android:gravity="bottom"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="3"></RadioButton>
+
+                    <RadioButton
+                        android:id="@+id/intensity_large"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="40"
+                        android:alpha="0.9"
+                        android:button="@drawable/radiobutton_selector_smiley_highintensity"
+                        android:gravity="bottom"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="4"></RadioButton>
+
+                    <RadioButton
+                        android:id="@+id/intensity_verylarge"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="40"
+                        android:button="@drawable/radiobutton_selector_smiley_highestintensity"
+                        android:gravity="bottom"
+                        android:onClick="onRadioButtonClicked"
+                        android:tag="5"></RadioButton>
+
                 </RadioGroup>
 
             </LinearLayout>
 
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentBottom="true"
             android:layout_gravity="center_horizontal"
-            android:layout_alignParentBottom="true">
-            <LinearLayout android:id="@+id/surfaceViewContainer"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:id="@+id/surfaceViewContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:layout_alignParentBottom="true">
-            <SurfaceView
-                android:id="@+id/cameraId"
-                android:layout_width="50px"
-                android:layout_height="50px" />
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center_horizontal">
+
+                <SurfaceView
+                    android:id="@+id/cameraId"
+                    android:layout_width="50px"
+                    android:layout_height="50px" />
             </LinearLayout>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
+            android:orientation="vertical">
+
             <LinearLayout
 
                 android:id="@+id/layoutUploadProgress"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                >
+                android:orientation="vertical"
+                android:visibility="gone">
+
                 <ProgressBar
                     android:id="@+id/uploadProgressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:indeterminate="false"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_marginRight="5dp"  />
+                    android:layout_marginRight="5dp"
+                    android:indeterminate="false" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -166,25 +225,27 @@
             <LinearLayout
                 android:id="@+id/footerButtonContainer"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/nextQuestion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="Next"
-                android:onClick="loadNextQuestion" />
-            <Button
-                android:id="@+id/lastQuestionSave"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="Save"
-                android:visibility="gone"
-                android:onClick="SaveData"/>
-                </LinearLayout>
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/nextQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:onClick="loadNextQuestion"
+                    android:text="Next" />
+
+                <Button
+                    android:id="@+id/lastQuestionSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:onClick="SaveData"
+                    android:text="Save"
+                    android:visibility="gone" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout >
+    </LinearLayout>
 </RelativeLayout>
