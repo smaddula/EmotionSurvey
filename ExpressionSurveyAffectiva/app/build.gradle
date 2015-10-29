@@ -38,4 +38,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['aws-android-sdk-s3*.jar'])
     compile fileTree(dir: 'libs/extras', include: ['aws-android-sdk-cognito*.jar'])
 
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }

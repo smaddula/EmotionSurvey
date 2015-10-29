@@ -68,7 +68,7 @@ public class UserPickActivity extends Activity {
                 if (e == null) {
                     String surveyId = objectList.get(0).getObjectId();
                     Intent intent = new Intent(UserPickActivity.this,
-                            MainActivity.class);
+                            CacheImages.class);
                     intent.putExtra("SurveyId", surveyId);
                     intent.putExtra("isTestSurvey", false);
                     startActivity(intent);
@@ -90,7 +90,7 @@ public class UserPickActivity extends Activity {
                 if (e == null) {
                     String surveyId = objectList.get(0).getObjectId();
                     Intent intent = new Intent(UserPickActivity.this,
-                            MainActivity.class);
+                            CacheImages.class);
                     intent.putExtra("SurveyId", surveyId);
                     intent.putExtra("isTestSurvey", true);
                     startActivity(intent);

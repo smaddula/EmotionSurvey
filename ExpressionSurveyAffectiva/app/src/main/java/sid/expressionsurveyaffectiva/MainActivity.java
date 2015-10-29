@@ -38,32 +38,32 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.squareup.picasso.Callback;
 
 import sid.UserSurveyData.FrameInformation;
 import sid.UserSurveyData.FullSurveyData;
 
 public class MainActivity extends Activity
-        implements Detector.FaceListener, Detector.ImageListener
-{
+        implements Detector.FaceListener, Detector.ImageListener {
     boolean savedDataToParse = false;
     boolean isTestSurvey = false;
     long lastImageSavedNano = 0;
     int questionIterator;
     int numberOfFilesUploaded = 0;
-    int numberOfFilesToUpload = 0 ;
-    HashMap<Question,Integer> imagesSavedPerQuestion;
+    int numberOfFilesToUpload = 0;
+    HashMap<Question, Integer> imagesSavedPerQuestion;
     int maxImagesPerQuestion = 6;
     boolean surveyComplete = false;
-    String surveyImagesDeviceDirectory ;
-    String SurveyImagesS3Directory ;
+    String surveyImagesDeviceDirectory;
+    String SurveyImagesS3Directory;
     boolean questionMotorActionPerformed = false;
-    FullSurveyData userData ;
-    UploadImagesBackgroundTask s3upload ;
+    FullSurveyData userData;
+    UploadImagesBackgroundTask s3upload;
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion = null;
-    RadioGroup valenceRadioGroup , intensityRadioGroup ;
-    LinearLayout surfaceViewContainer , footerButtonsContainer , uploadProgressBarContainer , ValenceIntensityRadioContainer, imageContainer ;
+    RadioGroup valenceRadioGroup, intensityRadioGroup;
+    LinearLayout surfaceViewContainer, footerButtonsContainer, uploadProgressBarContainer, ValenceIntensityRadioContainer, imageContainer;
     ProgressBar uploadProgressBar;
 
     private SurfaceView cameraPreview;
@@ -72,7 +72,7 @@ public class MainActivity extends Activity
 
     @Override
     public void onFaceDetectionStarted() {
-        if(surfaceViewContainer!=null && footerButtonsContainer!=null){
+        if (surfaceViewContainer != null && footerButtonsContainer != null) {
             imageContainer.setVisibility(View.VISIBLE);
             //surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
             cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(50, 50));
@@ -83,10 +83,10 @@ public class MainActivity extends Activity
 
     @Override
     public void onFaceDetectionStopped() {
-        if(surfaceViewContainer!=null && footerButtonsContainer!=null){
+        if (surfaceViewContainer != null && footerButtonsContainer != null) {
             imageContainer.setVisibility(View.GONE);
             //surfaceViewContainer.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
-            cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
+            cameraPreview.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
             footerButtonsContainer.setVisibility(View.GONE);
             ValenceIntensityRadioContainer.setVisibility(View.GONE);
         }
@@ -101,26 +101,26 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Date currentDate = new Date();
-        SurveyImagesS3Directory = ParseUser.getCurrentUser().getUsername()+ "_" +new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate) ;
+        SurveyImagesS3Directory = ParseUser.getCurrentUser().getUsername() + "_" + new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate);
         surveyImagesDeviceDirectory = getExternalFilesDir(null).getAbsolutePath() + File.separator + new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss").format(currentDate);
 
-        userData = new FullSurveyData("https://s3.amazonaws.com/surveyfacesnaps/"+SurveyImagesS3Directory+"/");
+        userData = new FullSurveyData("https://s3.amazonaws.com/surveyfacesnaps/" + SurveyImagesS3Directory + "/");
 
-        imagesSavedPerQuestion = new HashMap<Question,Integer>();
+        imagesSavedPerQuestion = new HashMap<Question, Integer>();
 
-        surfaceViewContainer = (LinearLayout)findViewById(R.id.surfaceViewContainer);
-        footerButtonsContainer = (LinearLayout)findViewById(R.id.footerButtonContainer);
-        uploadProgressBarContainer = (LinearLayout)findViewById(R.id.layoutUploadProgress);
-        uploadProgressBar = (ProgressBar)findViewById(R.id.uploadProgressBar);
-        ValenceIntensityRadioContainer = (LinearLayout)findViewById(R.id.smileyLayout);
-        imageContainer = (LinearLayout)findViewById(R.id.imageContainer);
+        surfaceViewContainer = (LinearLayout) findViewById(R.id.surfaceViewContainer);
+        footerButtonsContainer = (LinearLayout) findViewById(R.id.footerButtonContainer);
+        uploadProgressBarContainer = (LinearLayout) findViewById(R.id.layoutUploadProgress);
+        uploadProgressBar = (ProgressBar) findViewById(R.id.uploadProgressBar);
+        ValenceIntensityRadioContainer = (LinearLayout) findViewById(R.id.smileyLayout);
+        imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
-        valenceRadioGroup = (RadioGroup) findViewById( R.id.valenceRadioGroup);
+        valenceRadioGroup = (RadioGroup) findViewById(R.id.valenceRadioGroup);
         intensityRadioGroup = (RadioGroup) findViewById(R.id.intensityRadioGroup);
 
-        isTestSurvey =  getIntent().getBooleanExtra("isTestSurvey",false);
+        isTestSurvey = getIntent().getBooleanExtra("isTestSurvey", false);
 
-        if(!isTestSurvey) {
+        if (!isTestSurvey) {
 
             s3upload = new UploadImagesBackgroundTask(new IUploadedImageEvent() {
                 @Override
@@ -137,7 +137,7 @@ public class MainActivity extends Activity
             Thread uploaderThread = new Thread(s3upload);
             uploaderThread.start();
         }
-        questionIterator = 0 ;
+        questionIterator = 0;
         cameraPreview = (SurfaceView) findViewById(R.id.cameraId);
         // Put the SDK in camera mode by using this constructor. The SDK will be in control of
         // the camera. If a SurfaceView is passed in as the last argument to the constructor,
@@ -156,10 +156,10 @@ public class MainActivity extends Activity
         String surveyId = getIntent().getStringExtra("SurveyId");
 
         ParseQuery<ParseObject> innerquery = ParseQuery.getQuery("Survey");
-        innerquery.whereEqualTo("objectId",surveyId);
+        innerquery.whereEqualTo("objectId", surveyId);
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyQuestions");
-        query.whereMatchesQuery("SurveyId",innerquery);
+        query.whereMatchesQuery("SurveyId", innerquery);
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -189,7 +189,7 @@ public class MainActivity extends Activity
     @Override
     public void onImageResults(List<Face> faces, Frame image, float timeStamp) {
 
-        if(currentQuestion == null)
+        if (currentQuestion == null)
             return;
 
         if (faces == null) {
@@ -204,20 +204,20 @@ public class MainActivity extends Activity
 
         String UserFaceImageName = "";
         long currentNanosecond = System.nanoTime();
-        if(!imagesSavedPerQuestion.containsKey( currentQuestion))
-            imagesSavedPerQuestion.put(currentQuestion,0);
-        if(allQuestions.size()>0 && !questionMotorActionPerformed){
-            if(currentNanosecond - lastImageSavedNano <= 400*1000000)
-                Log.d("skipped saving image","Not saving image since we have saved an imaged very recently");
-        }else{
-            if(imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)>=0)
-                Log.d("skipped saving image","Not saving image since we have already saved " + Integer.toString( maxImagesPerQuestion)+" images for this question");
+        if (!imagesSavedPerQuestion.containsKey(currentQuestion))
+            imagesSavedPerQuestion.put(currentQuestion, 0);
+        if (allQuestions.size() > 0 && !questionMotorActionPerformed) {
+            if (currentNanosecond - lastImageSavedNano <= 400 * 1000000)
+                Log.d("skipped saving image", "Not saving image since we have saved an imaged very recently");
+        } else {
+            if (imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion) >= 0)
+                Log.d("skipped saving image", "Not saving image since we have already saved " + Integer.toString(maxImagesPerQuestion) + " images for this question");
         }
-        if ( !isTestSurvey && imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion)<0 && allQuestions.size()>0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400*1000000) {
+        if (!isTestSurvey && imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion) < 0 && allQuestions.size() > 0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400 * 1000000) {
             //Try saving image every 500 millisecond
             lastImageSavedNano = currentNanosecond;
 
-            imagesSavedPerQuestion.put(currentQuestion,imagesSavedPerQuestion.get(currentQuestion)+1);
+            imagesSavedPerQuestion.put(currentQuestion, imagesSavedPerQuestion.get(currentQuestion) + 1);
 
             UserFaceImageName = Long.toString(System.nanoTime()) + ".jpg";
             numberOfFilesToUpload++;
@@ -230,43 +230,49 @@ public class MainActivity extends Activity
     }
 
 
-    public void FinishServingQuestion(){
-        RadioButton valencerb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
-        RadioButton intensityrb = (RadioButton) findViewById( valenceRadioGroup.getCheckedRadioButtonId() );
+    public void FinishServingQuestion() {
+        RadioButton valencerb = (RadioButton) findViewById(valenceRadioGroup.getCheckedRadioButtonId());
+        RadioButton intensityrb = (RadioButton) findViewById(valenceRadioGroup.getCheckedRadioButtonId());
         userData.setUserInput(Integer.parseInt(valencerb.getTag().toString()), Integer.parseInt(intensityrb.getTag().toString()));
-        if(!surveyComplete) {
+        if (!surveyComplete) {
             valenceRadioGroup.clearCheck();
             intensityRadioGroup.clearCheck();
-        }
-        else
+        } else
             userData.DoneSurvey();
     }
 
-    public void loadNextQuestion( View view ){
-        if(valenceRadioGroup.getCheckedRadioButtonId() == -1)
+    public void loadNextQuestion(View view) {
+        if (valenceRadioGroup.getCheckedRadioButtonId() == -1)
             return;
 
-        if(intensityRadioGroup.getCheckedRadioButtonId() == -1)
+        if (intensityRadioGroup.getCheckedRadioButtonId() == -1)
             return;
 
         loadData();
     }
 
-    public void onRadioButtonClicked(View view){
+    public void onRadioButtonClicked(View view) {
 
         questionMotorActionPerformed = true;
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         //Dont want to do anything when back is pressed
     }
 
     public void SaveData(View view) throws IOException, com.parse.ParseException {
+
+        if (valenceRadioGroup.getCheckedRadioButtonId() == -1)
+            return;
+
+        if (intensityRadioGroup.getCheckedRadioButtonId() == -1)
+            return;
+
         detector.stop();
         surveyComplete = true;
         FinishServingQuestion();
-        if(isTestSurvey){
+        if (isTestSurvey) {
             uploadComplete();
             return;
         }
@@ -285,7 +291,7 @@ public class MainActivity extends Activity
                         e1.printStackTrace();
                     }
                     savedDataToParse = true;
-                    if(numberOfFilesToUpload == numberOfFilesUploaded){
+                    if (numberOfFilesToUpload == numberOfFilesUploaded) {
                         uploadComplete();
                     }
                 }
@@ -294,12 +300,16 @@ public class MainActivity extends Activity
         });
 
 
+        for(Question question : allQuestions){
+            PicassoSingletonImageHandler.getSharedInstance(getApplicationContext()).invalidate(question.ImageURI);
+        }
+
         s3upload.surveyComplete();
         uploadProgressBarContainer.setVisibility(View.VISIBLE);
         footerButtonsContainer.setVisibility(View.GONE);
 
         uploadProgressBar.setMax(numberOfFilesToUpload);
-        if(numberOfFilesToUpload == numberOfFilesUploaded && savedDataToParse){
+        if (numberOfFilesToUpload == numberOfFilesUploaded && savedDataToParse) {
             uploadComplete();
         }
     }
@@ -307,7 +317,7 @@ public class MainActivity extends Activity
     public void uploadComplete() {
 
 
-        if ( isTestSurvey || savedDataToParse) {
+        if (isTestSurvey || savedDataToParse) {
             //Delete the local directory
             File dir = new File(surveyImagesDeviceDirectory);
             if (dir.isDirectory()) {
@@ -327,32 +337,36 @@ public class MainActivity extends Activity
         }
     }
 
-    public void loadData(  ) {
+    public void loadData() {
         if (allQuestions.size() == 0)
             return;
         ImageView imageView = ((ImageView) findViewById(R.id.image));
 
-        new DownloadImageTask(new IDownloadedImageEvent() {
-                @Override
-                public void callback() {
-                    questionMotorActionPerformed = false;
-                    if(questionIterator!=0)
-                        FinishServingQuestion();
-                    currentQuestion = allQuestions.get(questionIterator);
+        PicassoSingletonImageHandler.getSharedInstance(getApplicationContext())
+                .load(allQuestions.get(questionIterator).ImageURI)
+                .into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        questionMotorActionPerformed = false;
+                        if (questionIterator != 0)
+                            FinishServingQuestion();
+                        currentQuestion = allQuestions.get(questionIterator);
 
-                    if(allQuestions.size() -1 == questionIterator){
-                        ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.VISIBLE);
-                        ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.GONE);
-                    }else {
-                        ((Button) findViewById(R.id.lastQuestionSave)).setVisibility(View.GONE);
-                        ((Button) findViewById(R.id.nextQuestion)).setVisibility(View.VISIBLE);
+                        if (allQuestions.size() - 1 == questionIterator) {
+                            findViewById(R.id.lastQuestionSave).setVisibility(View.VISIBLE);
+                            findViewById(R.id.nextQuestion).setVisibility(View.GONE);
+                        } else {
+                            findViewById(R.id.lastQuestionSave).setVisibility(View.GONE);
+                            findViewById(R.id.nextQuestion).setVisibility(View.VISIBLE);
+                        }
+
+                        questionIterator++;
                     }
 
-                    questionIterator++;
-                }
-            }
-            , imageView)
-                .execute(allQuestions.get(questionIterator).ImageURI);
+                    @Override
+                    public void onError() {
 
+                    }
+                });
     }
 }
