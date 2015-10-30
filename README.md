@@ -12,10 +12,12 @@ SDK's Used
 
 3. AWS Android SDK - Using AWS Conginto to provide permissions to S3 bucket use for uploading images - Details can be found in utils.java file . Keys can be configured through AWS console . Android SDK can be obtained from https://aws.amazon.com/mobile/sdk/
 
+4. Picasso - Using Picasso to cache images for better user experience. Add the reference to gradle file and you are all set.
+
 ### EmotionVisualizer:
 
 This is a nodejs project which shows charts to help analyze data collected through the survey . D3 was used for visualizations .
 
-This website is deployed at http://emotion-maddula.rhcloud.com
+This website is deployed at http://emotion-maddula.rhcloud.com (Reload if the page doesnot work since )
 
 
