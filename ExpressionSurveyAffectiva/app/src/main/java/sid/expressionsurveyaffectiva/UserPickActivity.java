@@ -29,6 +29,7 @@ public class UserPickActivity extends Activity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_pick);
+
     }
     public void onLogOffClick(View view){
         ParseUser.logOut();

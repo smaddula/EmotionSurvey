@@ -66,6 +66,9 @@ public class MainActivity extends Activity
     LinearLayout surfaceViewContainer, footerButtonsContainer, uploadProgressBarContainer, ValenceIntensityRadioContainer, imageContainer;
     ProgressBar uploadProgressBar;
 
+
+    ParseObject surveyObject;
+
     private SurfaceView cameraPreview;
     private CameraDetector detector;
 
@@ -155,11 +158,20 @@ public class MainActivity extends Activity
 
         String surveyId = getIntent().getStringExtra("SurveyId");
 
+
         ParseQuery<ParseObject> innerquery = ParseQuery.getQuery("Survey");
         innerquery.whereEqualTo("objectId", surveyId);
 
+        try {
+        surveyObject = innerquery.getFirst();
+        } catch (ParseException e) {
+            surveyObject = null;
+            e.printStackTrace();
+        }
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyQuestions");
-        query.whereMatchesQuery("SurveyId", innerquery);
+        query.whereEqualTo("SurveyId", surveyObject);
+
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -285,6 +297,7 @@ public class MainActivity extends Activity
                     ParseObject userSurvey = new ParseObject("SurveyData");
                     userSurvey.put("UserID", ParseUser.getCurrentUser());
                     userSurvey.put("JsonEmotionData", emotionFrameData);
+                    userSurvey.put("SurveyId",surveyObject);
                     try {
                         userSurvey.save();
                     } catch (ParseException e1) {
