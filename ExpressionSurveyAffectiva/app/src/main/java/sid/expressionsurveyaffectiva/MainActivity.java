@@ -62,9 +62,9 @@ public class MainActivity extends Activity
     List<Question> allQuestions = new ArrayList<Question>();
     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").serializeSpecialFloatingPointValues().create();
     Question currentQuestion = null;
-    RadioGroup valenceRadioGroup, intensityRadioGroup;
     LinearLayout surfaceViewContainer, footerButtonsContainer, uploadProgressBarContainer, ValenceIntensityRadioContainer, imageContainer;
     ProgressBar uploadProgressBar;
+    IntensityValenceUIManager intensityValenceUIManager;
 
     private SurfaceView cameraPreview;
     private CameraDetector detector;
@@ -115,8 +115,7 @@ public class MainActivity extends Activity
         ValenceIntensityRadioContainer = (LinearLayout) findViewById(R.id.smileyLayout);
         imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
-        valenceRadioGroup = (RadioGroup) findViewById(R.id.valenceRadioGroup);
-        intensityRadioGroup = (RadioGroup) findViewById(R.id.intensityRadioGroup);
+        intensityValenceUIManager = new IntensityValenceUIManager(this);
 
         isTestSurvey = getIntent().getBooleanExtra("isTestSurvey", false);
 
@@ -231,28 +230,27 @@ public class MainActivity extends Activity
 
 
     public void FinishServingQuestion() {
-        RadioButton valencerb = (RadioButton) findViewById(valenceRadioGroup.getCheckedRadioButtonId());
-        RadioButton intensityrb = (RadioButton) findViewById(valenceRadioGroup.getCheckedRadioButtonId());
-        userData.setUserInput(Integer.parseInt(valencerb.getTag().toString()), Integer.parseInt(intensityrb.getTag().toString()));
+        userData.setUserInput(intensityValenceUIManager.getValenceSelected().getIntValue(), intensityValenceUIManager.getIntensitySelected().getIntValue());
         if (!surveyComplete) {
-            valenceRadioGroup.clearCheck();
-            intensityRadioGroup.clearCheck();
+        intensityValenceUIManager.resetRadioGroups();
         } else
             userData.DoneSurvey();
     }
 
     public void loadNextQuestion(View view) {
-        if (valenceRadioGroup.getCheckedRadioButtonId() == -1)
-            return;
 
-        if (intensityRadioGroup.getCheckedRadioButtonId() == -1)
+        if(!intensityValenceUIManager.intensityValenceSelected())
             return;
 
         loadData();
     }
 
-    public void onRadioButtonClicked(View view) {
+    public void onIntensityRadioButtonClicked(View view) {
+        questionMotorActionPerformed = true;
+    }
 
+    public void onValenceRadioButtonClicked(View view) {
+        intensityValenceUIManager.updateIntensityRadioButtons();
         questionMotorActionPerformed = true;
     }
 
@@ -263,10 +261,7 @@ public class MainActivity extends Activity
 
     public void SaveData(View view) throws IOException, com.parse.ParseException {
 
-        if (valenceRadioGroup.getCheckedRadioButtonId() == -1)
-            return;
-
-        if (intensityRadioGroup.getCheckedRadioButtonId() == -1)
+        if(!intensityValenceUIManager.intensityValenceSelected())
             return;
 
         detector.stop();
