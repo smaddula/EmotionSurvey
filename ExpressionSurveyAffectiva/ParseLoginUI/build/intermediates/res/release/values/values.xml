@@ -140,6 +140,7 @@
     <string name="com_parse_ui_twitter_login_failed_toast">Twitter login failed</string>
     <string name="com_parse_ui_username_input_hint">Username</string>
     <string name="com_parse_ui_username_taken_toast">Username is already taken, please choose a different one</string>
+    <string name="com_parse_ui_wrong_age_toast">Please enter a valid age</string>
     <!-- From: file:/C:/Work/FacialExpression/ExpressionSurveyAffectiva/ExpressionSurveyAffectiva/ParseLoginUI/build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.0.1/res/values/values.xml -->
     <eat-comment/>
     <string name="messenger_send_button_text">Send</string>

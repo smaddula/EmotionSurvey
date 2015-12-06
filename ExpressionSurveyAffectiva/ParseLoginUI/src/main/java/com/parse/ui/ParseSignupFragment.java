@@ -28,13 +28,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * Fragment for the user signup screen.
@@ -48,6 +54,8 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
   private EditText confirmPasswordField;
   private EditText emailField;
   private EditText nameField;
+  private Spinner sexField;
+  private Spinner ageField;
   private Button createAccountButton;
   private ParseOnLoginSuccessListener onLoginSuccessListener;
 
@@ -57,6 +65,8 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
   private static final String LOG_TAG = "ParseSignupFragment";
   private static final int DEFAULT_MIN_PASSWORD_LENGTH = 6;
   private static final String USER_OBJECT_NAME_FIELD = "name";
+  private static final String USER_OBJECT_AGE_FIELD = "age";
+  private static final String USER_OBJECT_SEX_FIELD = "sex";
 
   public static ParseSignupFragment newInstance(Bundle configOptions, String username, String password) {
     ParseSignupFragment signupFragment = new ParseSignupFragment();
@@ -91,6 +101,36 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
         .findViewById(R.id.signup_confirm_password_input);
     emailField = (EditText) v.findViewById(R.id.signup_email_input);
     nameField = (EditText) v.findViewById(R.id.signup_name_input);
+
+    sexField = (Spinner) v.findViewById(R.id.signup_sex_input);
+    ageField = (Spinner) v.findViewById(R.id.signup_age_input);
+
+    
+/*
+    sexField.setFocusable(true);
+    sexField.setFocusableInTouchMode(true);
+    sexField.requestFocus();
+
+    ageField.setFocusable(true);
+    ageField.setFocusableInTouchMode(true);
+    ageField.requestFocus();
+*/
+    String[] sexArray = new String[] {
+            "M", "F"
+    };
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(v.getContext(),
+            android.R.layout.simple_spinner_item, sexArray);
+    sexField.setAdapter(adapter);
+
+
+    List ageArray = new ArrayList<Integer>();
+    for (int i = 18; i <= 100; i++) {
+        ageArray.add(Integer.toString(i));
+    }
+
+    ageField.setAdapter(new ArrayAdapter<String>(v.getContext(),
+            android.R.layout.simple_spinner_item, ageArray));
+
     createAccountButton = (Button) v.findViewById(R.id.create_account);
 
     usernameField.setText(username);
@@ -152,6 +192,12 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
       name = nameField.getText().toString();
     }
 
+    String sex = "M";
+    sex  = sexField.getSelectedItem().toString();
+
+    Integer age = 0;
+    age = Integer.parseInt(ageField.getSelectedItem().toString());
+
     if (username.length() == 0) {
       if (config.isParseLoginEmailAsUsername()) {
         showToast(R.string.com_parse_ui_no_email_toast);
@@ -174,6 +220,8 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
       showToast(R.string.com_parse_ui_no_email_toast);
     } else if (name != null && name.length() == 0) {
       showToast(R.string.com_parse_ui_no_name_toast);
+    } else if (age<18) {
+      showToast(R.string.com_parse_ui_wrong_age_toast);
     } else {
       ParseUser user = new ParseUser();
 
@@ -187,7 +235,12 @@ public class ParseSignupFragment extends ParseLoginFragmentBase implements OnCli
         user.put(USER_OBJECT_NAME_FIELD, name);
       }
 
-      loadingStart();
+      user.put(USER_OBJECT_AGE_FIELD, age);
+
+      user.put(USER_OBJECT_SEX_FIELD, sex);
+
+
+        loadingStart();
       user.signUpInBackground(new SignUpCallback() {
 
         @Override

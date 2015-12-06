@@ -32,6 +32,7 @@
     <string name="com_parse_ui_invalid_email_toast">Email is invalid, please correct it and try again</string>
     <string name="com_parse_ui_email_taken_toast">Email is already taken, please reset your password instead</string>
     <string name="com_parse_ui_no_name_toast">Please enter your name</string>
+    <string name="com_parse_ui_wrong_age_toast">Please enter a valid age</string>
     <string name="com_parse_ui_signup_failed_unknown_toast">Could not sign up, please try again later</string>
     <string name="com_parse_ui_login_help_instructions">Enter your email to recover your password</string>
     <string name="com_parse_ui_login_help_email_input_hint">Email</string>
@@ -58,4 +59,5 @@
 
     <string name="com_parse_ui_login_dispatch_user_logged_in">"User logged in, starting: "</string>
     <string name="com_parse_ui_login_dispatch_user_not_logged_in">User not logged in, starting ParseLoginActivity</string>
+
 </resources>
