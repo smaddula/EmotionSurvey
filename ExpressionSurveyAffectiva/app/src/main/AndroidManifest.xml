@@ -20,10 +20,10 @@
 
     <application
         android:name=".ExpressionSurvey"
-        android:largeHeap="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainDispatchActivity"
@@ -77,6 +77,10 @@
         <activity
             android:name=".CacheImages"
             android:label="@string/title_activity_cache_images" >
+        </activity>
+        <activity
+            android:name=".ConfirmationStart"
+            android:label="@string/title_activity_confirmation_start" >
         </activity>
     </application>
 

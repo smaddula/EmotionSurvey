@@ -46,58 +46,10 @@ public class UserPickActivity extends Activity {
         }
     }
 
-    public void onVisualizationsLatestClick(View view) throws ParseException {
-        ParseUser currentUser = ParseUser.getCurrentUser() ;
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyData");
-        query.whereEqualTo("UserID", currentUser);
-        query.orderByDescending("createdAt");
-        ParseObject result = query.getFirst();
-        String url = "http://emotion-maddula.rhcloud.com/survey/"+result.getObjectId();
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+    public void onStartSurveyClick(View view) {
+        Intent intent = new Intent(UserPickActivity.this,
+                ConfirmationStart.class);
         startActivity(intent);
     }
 
-    public void onStartSurveyClick(View view){
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Survey");
-        query.whereEqualTo("isTestSurvey",false);
-        query.whereEqualTo("isValid",true);
-        query.setLimit(1);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
-                if (e == null) {
-                    String surveyId = objectList.get(0).getObjectId();
-                    Intent intent = new Intent(UserPickActivity.this,
-                            CacheImages.class);
-                    intent.putExtra("SurveyId", surveyId);
-                    intent.putExtra("isTestSurvey", false);
-                    startActivity(intent);
-                } else {
-                    // something went wrong
-                }
-            }
-        });
-    }
-
-    public void onPracticeSurveyClick(View view){
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Survey");
-        query.whereEqualTo("isTestSurvey",true);
-        query.whereEqualTo("isValid",true);
-        query.setLimit(1);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
-                if (e == null) {
-                    String surveyId = objectList.get(0).getObjectId();
-                    Intent intent = new Intent(UserPickActivity.this,
-                            CacheImages.class);
-                    intent.putExtra("SurveyId", surveyId);
-                    intent.putExtra("isTestSurvey", true);
-                    startActivity(intent);
-                } else {
-                    // something went wrong
-                }
-            }
-        });
-    }
 }

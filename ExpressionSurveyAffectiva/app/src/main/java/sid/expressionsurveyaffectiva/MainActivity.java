@@ -11,6 +11,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -24,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.affectiva.android.affdex.sdk.Frame;
@@ -312,7 +314,6 @@ public class MainActivity extends Activity
 
     public void uploadComplete() {
 
-
         if (isTestSurvey || savedDataToParse) {
             //Delete the local directory
             File dir = new File(surveyImagesDeviceDirectory);
@@ -324,12 +325,21 @@ public class MainActivity extends Activity
                 dir.delete();
             }
 
+            Toast.makeText(this.getApplicationContext(), "Survey completed and you are being logged out", Toast.LENGTH_LONG).show();
 
-            //switch to a different view
-            Intent intent = new Intent(MainActivity.this,
-                    UserPickActivity.class);
-            startActivity(intent);
-            finish();
+            ParseUser.logOut();
+
+            // FLAG_ACTIVITY_CLEAR_TASK only works on API 11, so if the user
+            // logs out on older devices, we'll just exit.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                Intent intent = new Intent(MainActivity.this,
+                        MainDispatchActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            } else {
+                finish();
+            }
         }
     }
 
@@ -340,7 +350,6 @@ public class MainActivity extends Activity
 
         if(((BitmapDrawable)imageView.getDrawable())!=null)
             ((BitmapDrawable)imageView.getDrawable()).getBitmap().recycle();
-
 
         PicassoSingletonImageHandler.getSharedInstance(getApplicationContext())
                 .load(allQuestions.get(questionIterator).ImageURI)
