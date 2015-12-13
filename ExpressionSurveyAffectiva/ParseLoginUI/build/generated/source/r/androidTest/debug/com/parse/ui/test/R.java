@@ -239,7 +239,7 @@ containing a value of this type.
         public static final int com_facebook_tooltip_bubble_view_bottom_pointer=0x7f090018;
         public static final int com_facebook_tooltip_bubble_view_text_body=0x7f090017;
         public static final int com_facebook_tooltip_bubble_view_top_pointer=0x7f090015;
-        public static final int create_account=0x7f09002b;
+        public static final int create_account=0x7f09002d;
         public static final int display_always=0x7f09000d;
         public static final int facebook_login=0x7f090024;
         public static final int inline=0x7f090007;
@@ -250,7 +250,7 @@ containing a value of this type.
         public static final int login_help_submit=0x7f090023;
         public static final int login_password_input=0x7f09001c;
         public static final int login_username_input=0x7f09001b;
-        public static final int messenger_send_button=0x7f09002c;
+        public static final int messenger_send_button=0x7f09002e;
         public static final int never_display=0x7f09000e;
         public static final int normal=0x7f090010;
         public static final int open_graph=0x7f090000;
@@ -261,10 +261,12 @@ containing a value of this type.
         public static final int parse_login_help=0x7f090020;
         public static final int parse_signup_button=0x7f09001f;
         public static final int right=0x7f09000b;
+        public static final int signup_age_input=0x7f09002c;
         public static final int signup_confirm_password_input=0x7f090028;
         public static final int signup_email_input=0x7f090029;
         public static final int signup_name_input=0x7f09002a;
         public static final int signup_password_input=0x7f090027;
+        public static final int signup_sex_input=0x7f09002b;
         public static final int signup_username_input=0x7f090026;
         public static final int small=0x7f090011;
         public static final int standard=0x7f090005;
@@ -362,6 +364,7 @@ containing a value of this type.
         public static final int com_parse_ui_twitter_login_failed_toast=0x7f04003a;
         public static final int com_parse_ui_username_input_hint=0x7f04003b;
         public static final int com_parse_ui_username_taken_toast=0x7f04003c;
+        public static final int com_parse_ui_wrong_age_toast=0x7f040043;
         public static final int messenger_send_button_text=0x7f040000;
     }
     public static final class style {

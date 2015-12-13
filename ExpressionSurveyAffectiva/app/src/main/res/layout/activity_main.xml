@@ -47,17 +47,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:button="@drawable/radiobutton_selector_smiley_happiest"
+                        android:button="@drawable/radiobutton_selector_smiley_verysad"
                         android:onClick="onValenceRadioButtonClicked"
-                        android:tag="5"></RadioButton>
+                        android:tag="1"></RadioButton>
+
 
                     <RadioButton
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:button="@drawable/radiobutton_selector_smiley_littlehappy"
+                        android:button="@drawable/radiobutton_selector_smiley_littlesad"
                         android:onClick="onValenceRadioButtonClicked"
-                        android:tag="4"></RadioButton>
+                        android:tag="2"></RadioButton>
+
 
                     <RadioButton
                         android:layout_width="0dp"
@@ -71,17 +73,20 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:button="@drawable/radiobutton_selector_smiley_littlesad"
+                        android:button="@drawable/radiobutton_selector_smiley_littlehappy"
                         android:onClick="onValenceRadioButtonClicked"
-                        android:tag="2"></RadioButton>
+                        android:tag="4"></RadioButton>
+
 
                     <RadioButton
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:button="@drawable/radiobutton_selector_smiley_verysad"
+                        android:button="@drawable/radiobutton_selector_smiley_happiest"
                         android:onClick="onValenceRadioButtonClicked"
-                        android:tag="1"></RadioButton>
+                        android:tag="5"></RadioButton>
+
+
                 </RadioGroup>
 
                 <RadioGroup

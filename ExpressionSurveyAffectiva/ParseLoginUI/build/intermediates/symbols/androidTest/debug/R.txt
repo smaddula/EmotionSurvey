@@ -111,7 +111,7 @@ int id com_facebook_login_activity_progress_bar 0x7f090013
 int id com_facebook_tooltip_bubble_view_bottom_pointer 0x7f090018
 int id com_facebook_tooltip_bubble_view_text_body 0x7f090017
 int id com_facebook_tooltip_bubble_view_top_pointer 0x7f090015
-int id create_account 0x7f09002b
+int id create_account 0x7f09002d
 int id display_always 0x7f09000d
 int id facebook_login 0x7f090024
 int id inline 0x7f090007
@@ -122,7 +122,7 @@ int id login_help_instructions 0x7f090021
 int id login_help_submit 0x7f090023
 int id login_password_input 0x7f09001c
 int id login_username_input 0x7f09001b
-int id messenger_send_button 0x7f09002c
+int id messenger_send_button 0x7f09002e
 int id never_display 0x7f09000e
 int id normal 0x7f090010
 int id open_graph 0x7f090000
@@ -133,10 +133,12 @@ int id parse_login_button 0x7f09001e
 int id parse_login_help 0x7f090020
 int id parse_signup_button 0x7f09001f
 int id right 0x7f09000b
+int id signup_age_input 0x7f09002c
 int id signup_confirm_password_input 0x7f090028
 int id signup_email_input 0x7f090029
 int id signup_name_input 0x7f09002a
 int id signup_password_input 0x7f090027
+int id signup_sex_input 0x7f09002b
 int id signup_username_input 0x7f090026
 int id small 0x7f090011
 int id standard 0x7f090005
@@ -228,6 +230,7 @@ int string com_parse_ui_twitter_login_button_label 0x7f040039
 int string com_parse_ui_twitter_login_failed_toast 0x7f04003a
 int string com_parse_ui_username_input_hint 0x7f04003b
 int string com_parse_ui_username_taken_toast 0x7f04003c
+int string com_parse_ui_wrong_age_toast 0x7f040043
 int string messenger_send_button_text 0x7f040000
 int style MessengerButton 0x7f080000
 int style MessengerButton_Blue 0x7f080001

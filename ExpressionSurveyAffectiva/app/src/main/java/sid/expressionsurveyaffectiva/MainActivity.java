@@ -10,6 +10,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -144,7 +145,7 @@ public class MainActivity extends Activity
 
         detector = new CameraDetector(this, CameraDetector.CameraType.CAMERA_FRONT, cameraPreview);
         detector.setLicensePath("sdk_parisa.rashidi@ufl.edu.license");
-        detector.setMaxProcessRate(20);
+        detector.setMaxProcessRate(5);
         detector.setImageListener(this);
         detector.setFaceListener(this);
         detector.setDetectAllEmotions(true);
@@ -337,8 +338,13 @@ public class MainActivity extends Activity
             return;
         ImageView imageView = ((ImageView) findViewById(R.id.image));
 
+        if(((BitmapDrawable)imageView.getDrawable())!=null)
+            ((BitmapDrawable)imageView.getDrawable()).getBitmap().recycle();
+
+
         PicassoSingletonImageHandler.getSharedInstance(getApplicationContext())
                 .load(allQuestions.get(questionIterator).ImageURI)
+                .fit()
                 .into(imageView, new Callback() {
                     @Override
                     public void onSuccess() {
