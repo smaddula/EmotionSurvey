@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -29,6 +30,8 @@ public class UserPickActivity extends Activity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_pick);
+        TextView userBanner = (TextView)findViewById(R.id.loggedInUserName);
+        userBanner.setText("Logged in as "+ParseUser.getCurrentUser().getUsername());
     }
     public void onLogOffClick(View view){
         ParseUser.logOut();

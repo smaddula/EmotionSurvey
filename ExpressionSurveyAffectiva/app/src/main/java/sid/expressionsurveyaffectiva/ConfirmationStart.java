@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.parse.FindCallback;
 import com.parse.ParseObject;
@@ -26,6 +27,8 @@ public class ConfirmationStart extends Activity{
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirmation_start);
+        TextView userBanner = (TextView)findViewById(R.id.loggedInUserName);
+        userBanner.setText("Logged in as " + ParseUser.getCurrentUser().getUsername());
     }
 
 

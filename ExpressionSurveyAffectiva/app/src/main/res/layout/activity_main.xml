@@ -35,8 +35,25 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 tools:context=".GridLayoutActivity">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/black" />
 
-
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lowest Emotion"
+                        android:layout_alignParentLeft="true"/>
+                    <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lowest Emotion"
+                    android:layout_alignParentRight="true"/>
+                </RelativeLayout>
                 <RadioGroup
                     android:id="@+id/valenceRadioGroup"
                     android:layout_width="match_parent"
@@ -88,6 +105,25 @@
 
 
                 </RadioGroup>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/black" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lowest Intensity"
+                        android:layout_alignParentLeft="true"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Highest Intensity"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
 
                 <RadioGroup
                     android:id="@+id/intensityRadioGroup"
