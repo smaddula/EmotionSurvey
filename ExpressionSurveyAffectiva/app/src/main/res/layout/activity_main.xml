@@ -110,21 +110,6 @@
                     android:layout_height="1dp"
                     android:background="@android:color/black" />
 
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Lowest Intensity"
-                        android:layout_alignParentLeft="true"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Highest Intensity"
-                        android:layout_alignParentRight="true"/>
-                </RelativeLayout>
-
                 <RadioGroup
                     android:id="@+id/intensityRadioGroup"
                     android:layout_width="match_parent"
@@ -141,6 +126,7 @@
                         android:layout_weight="30"
                         android:alpha="0.6"
                         android:gravity="bottom"
+                        android:button="@drawable/radiobutton_selector_lowestintensity_highestvalence"
                         android:onClick="onIntensityRadioButtonClicked"
                         android:tag="1"></RadioButton>
 
@@ -152,6 +138,7 @@
                         android:alpha="0.7"
                         android:gravity="bottom"
                         android:onClick="onIntensityRadioButtonClicked"
+                        android:button="@drawable/radiobutton_selector_lowintensity_highestvalence"
                         android:tag="2"></RadioButton>
 
                     <RadioButton
@@ -161,6 +148,8 @@
                         android:layout_weight="35"
                         android:alpha="0.8"
                         android:gravity="bottom"
+
+                        android:button="@drawable/radiobutton_selector_moderateintensity_highestvalence"
                         android:onClick="onIntensityRadioButtonClicked"
                         android:tag="3"></RadioButton>
 
@@ -171,6 +160,7 @@
                         android:layout_weight="40"
                         android:alpha="0.9"
                         android:gravity="bottom"
+                        android:button="@drawable/radiobutton_selector_highintensity_highestvalence"
                         android:onClick="onIntensityRadioButtonClicked"
                         android:tag="4"></RadioButton>
 
@@ -180,10 +170,26 @@
                         android:layout_height="match_parent"
                         android:layout_weight="40"
                         android:gravity="bottom"
+                        android:button="@drawable/radiobutton_selector_highestintensity_highestvalence"
                         android:onClick="onIntensityRadioButtonClicked"
                         android:tag="5"></RadioButton>
 
                 </RadioGroup>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lowest Intensity"
+                        android:layout_alignParentLeft="true"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Highest Intensity"
+                        android:layout_alignParentRight="true"/>
+                </RelativeLayout>
 
             </LinearLayout>
 
