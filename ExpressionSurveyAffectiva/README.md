@@ -16,8 +16,11 @@ Explaining each of the task below
 1) Affectiva Logic - Main activity implements FaceListener, ImageListener which are affectiva's interfaces. Explaining the affectiva's functions and also OnCreate 
 a) onFaceDetectionStopped - When face is not detected then this event is triggered where we are hiding the image , radio buttons and 
 buttons so that the surfaceview which displays user face takes up the whole screen.
+
 b) onFaceDetectionStarted - If face got detected then this event is triggered . In this event we restore the visibility of the components that are required for the survey to be continued and shrink the surfaceView
+
 c) onCreate - This is the location where the activity is initialized . this is the place where all affectiva's compononets and background threads are initialized. We also set frame rate for affectiva here.
+
 d) onImageResults - This is called for each user's image processed by affectiva . This image is sent to background thread to save the file in S3. This also has details of user's emotion derived from this image.
 
 2) UI related Logics - Several functions here which guide logic like changing images in intensity when valence is changed , 
