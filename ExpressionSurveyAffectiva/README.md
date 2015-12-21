@@ -22,8 +22,6 @@ d) onImageResults - This is called for each user's image processed by affectiva 
 
 2) UI related Logics - Several functions here which guide logic like changing images in intensity when valence is changed , 
 
-
-
 Res Folder
 
 Layouts - The app has 4 layouts 
@@ -39,4 +37,10 @@ Layouts - The app has 4 layouts
 Drawable - Smileys
 
 Each radio button can have 2 states ie selected and non-selected image used in the radio button is dynamically changed based on the state of the radio button. This is achieved by using xml selectors , these are present in drawable folder along with the png images that represent all possible smileys . This model is inspired from http://stackoverflow.com/questions/19163628/adding-custom-radio-buttons-in-android
+
+UserSurveyDate - DTO Objects 
+
+Various classes used to store the emotion data collected through out the survey . This data is inturn saved as a ParseFile and stored in parse server as a JSON file . 
+
+To generate apk file from Android Studio . From the menu select Build->Generate Signed APK .
 
