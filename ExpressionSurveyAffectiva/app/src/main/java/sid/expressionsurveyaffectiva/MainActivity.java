@@ -175,6 +175,9 @@ public class MainActivity extends Activity
                         }
                     }
                     loadData();
+                    //If the control comes here then user had no issues starting the survey hence
+                    // mark that user has seen the survey data and hence cannot start again
+                    ParseUser.getCurrentUser().put("startedSurvey", true);
                 } else {
                     // something went wrong
                 }
@@ -205,7 +208,7 @@ public class MainActivity extends Activity
         if (!imagesSavedPerQuestion.containsKey(currentQuestion))
             imagesSavedPerQuestion.put(currentQuestion, 0);
         if (allQuestions.size() > 0 && !questionMotorActionPerformed) {
-            if (currentNanosecond - lastImageSavedNano <= 400 * 1000000)
+            if (currentNanosecond - lastImageSavedNano <= 300 * 1000000)
                 Log.d("skipped saving image", "Not saving image since we have saved an imaged very recently");
         } else {
             if (imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion) >= 0)
@@ -307,8 +310,6 @@ public class MainActivity extends Activity
     }
 
     public void uploadComplete() {
-
-        ParseUser.getCurrentUser().put("startedSurvey",true);
 
         if ( savedDataToParse) {
             //Delete the local directory
