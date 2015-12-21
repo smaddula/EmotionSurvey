@@ -1,4 +1,4 @@
-Two Modules
+**Two Modules**
 
 * ParseUI - This is the login screen , this component is open source login provider for parse backend (google for parse login ui). Made changes to ParseSignupFragment to store Sex and Age of the user.
 
