@@ -49,7 +49,6 @@ import sid.UserSurveyData.FullSurveyData;
 public class MainActivity extends Activity
         implements Detector.FaceListener, Detector.ImageListener {
     boolean savedDataToParse = false;
-    boolean isTestSurvey = false;
     long lastImageSavedNano = 0;
     int questionIterator;
     int numberOfFilesUploaded = 0;
@@ -120,27 +119,24 @@ public class MainActivity extends Activity
 
         intensityValenceUIManager = new IntensityValenceUIManager(this);
 
-        isTestSurvey = getIntent().getBooleanExtra("isTestSurvey", false);
 
-        if (!isTestSurvey) {
-
-            s3upload = new UploadImagesBackgroundTask(new IUploadedImageEvent() {
-                @Override
-                public void callback(int completedUploads) {
-                    numberOfFilesUploaded = completedUploads;
-                    uploadProgressBar.setMax(numberOfFilesToUpload);
-                    uploadProgressBar.setProgress(numberOfFilesUploaded);
-                    if (numberOfFilesUploaded == numberOfFilesToUpload && surveyComplete) {
-                        uploadComplete();
-                    }
+        s3upload = new UploadImagesBackgroundTask(new IUploadedImageEvent() {
+            @Override
+            public void callback(int completedUploads) {
+                numberOfFilesUploaded = completedUploads;
+                uploadProgressBar.setMax(numberOfFilesToUpload);
+                uploadProgressBar.setProgress(numberOfFilesUploaded);
+                if (numberOfFilesUploaded == numberOfFilesToUpload && surveyComplete) {
+                    uploadComplete();
                 }
-            }, this, surveyImagesDeviceDirectory, SurveyImagesS3Directory);
+            }
+        }, this, surveyImagesDeviceDirectory, SurveyImagesS3Directory);
 
-            Thread uploaderThread = new Thread(s3upload);
-            uploaderThread.start();
-        }
+        Thread uploaderThread = new Thread(s3upload);
+        uploaderThread.start();
         questionIterator = 0;
         cameraPreview = (SurfaceView) findViewById(R.id.cameraId);
+
         // Put the SDK in camera mode by using this constructor. The SDK will be in control of
         // the camera. If a SurfaceView is passed in as the last argument to the constructor,
         // that view will be painted with what the camera sees.
@@ -215,7 +211,7 @@ public class MainActivity extends Activity
             if (imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion) >= 0)
                 Log.d("skipped saving image", "Not saving image since we have already saved " + Integer.toString(maxImagesPerQuestion) + " images for this question");
         }
-        if (!isTestSurvey && imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion) < 0 && allQuestions.size() > 0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400 * 1000000) {
+        if (imagesSavedPerQuestion.get(currentQuestion).compareTo(maxImagesPerQuestion) < 0 && allQuestions.size() > 0 && !questionMotorActionPerformed && currentNanosecond - lastImageSavedNano > 400 * 1000000) {
             //Try saving image every 500 millisecond
             lastImageSavedNano = currentNanosecond;
 
@@ -228,6 +224,7 @@ public class MainActivity extends Activity
 
         Face face = faces.get(0);
 
+        // Storing emotion data in collections which is uploaded at the end
         userData.AddFrameData(currentQuestion, new FrameInformation(face, UserFaceImageName, questionMotorActionPerformed));
     }
 
@@ -270,10 +267,7 @@ public class MainActivity extends Activity
         detector.stop();
         surveyComplete = true;
         FinishServingQuestion();
-        if (isTestSurvey) {
-            uploadComplete();
-            return;
-        }
+
         final ParseFile emotionFrameData = new ParseFile("FrameEmotionData.txt", gson.toJson(userData).getBytes());
         emotionFrameData.saveInBackground(new SaveCallback() {
             @Override
@@ -314,7 +308,9 @@ public class MainActivity extends Activity
 
     public void uploadComplete() {
 
-        if (isTestSurvey || savedDataToParse) {
+        ParseUser.getCurrentUser().put("startedSurvey",true);
+
+        if ( savedDataToParse) {
             //Delete the local directory
             File dir = new File(surveyImagesDeviceDirectory);
             if (dir.isDirectory()) {

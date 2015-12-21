@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -35,7 +36,6 @@ public class UserPickActivity extends Activity {
     }
     public void onLogOffClick(View view){
         ParseUser.logOut();
-
         // FLAG_ACTIVITY_CLEAR_TASK only works on API 11, so if the user
         // logs out on older devices, we'll just exit.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -50,9 +50,31 @@ public class UserPickActivity extends Activity {
     }
 
     public void onStartSurveyClick(View view) {
-        Intent intent = new Intent(UserPickActivity.this,
-                ConfirmationStart.class);
-        startActivity(intent);
-    }
 
+        Boolean doneSurveyAlready = ParseUser.getCurrentUser().getBoolean("startedSurvey");
+
+        if(doneSurveyAlready){
+            Toast.makeText(this.getApplicationContext(), "Logging off since you have already started the survey before", Toast.LENGTH_LONG).show();
+            onLogOffClick(null);
+            return;
+        }
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Survey");
+        query.whereEqualTo("isValid", true);
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
+                if (e == null) {
+                    String surveyId = objectList.get(0).getObjectId();
+                    Intent intent = new Intent(UserPickActivity.this,
+                            ConfirmationStart.class);
+                    intent.putExtra("SurveyId", surveyId);
+                    startActivity(intent);
+                } else {
+                    // something went wrong
+                }
+            }
+        });
+    }
 }

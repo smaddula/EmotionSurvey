@@ -11,8 +11,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -20,6 +22,8 @@ import com.parse.ParseUser;
 import java.util.List;
 
 public class ConfirmationStart extends Activity{
+
+    String surveyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,29 +33,16 @@ public class ConfirmationStart extends Activity{
         setContentView(R.layout.activity_confirmation_start);
         TextView userBanner = (TextView)findViewById(R.id.loggedInUserName);
         userBanner.setText("Logged in as " + ParseUser.getCurrentUser().getUsername());
+        surveyId = getIntent().getStringExtra("SurveyId");
+
     }
 
+    public void onStartSurveyClick(View view) throws ParseException {
 
-    public void onStartSurveyClick(View view){
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Survey");
-        query.whereEqualTo("isTestSurvey",false);
-        query.whereEqualTo("isValid",true);
-        query.setLimit(1);
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
-                if (e == null) {
-                    String surveyId = objectList.get(0).getObjectId();
-                    Intent intent = new Intent(ConfirmationStart.this,
-                            CacheImages.class);
-                    intent.putExtra("SurveyId", surveyId);
-                    intent.putExtra("isTestSurvey", false);
-                    startActivity(intent);
-                } else {
-                    // something went wrong
-                }
-            }
-        });
+        Intent intent = new Intent(ConfirmationStart.this,
+                CacheImages.class);
+        intent.putExtra("SurveyId", surveyId);
+        startActivity(intent);
     }
 
     public void onLogOffClick(View view){
@@ -69,5 +60,4 @@ public class ConfirmationStart extends Activity{
             finish();
         }
     }
-
 }

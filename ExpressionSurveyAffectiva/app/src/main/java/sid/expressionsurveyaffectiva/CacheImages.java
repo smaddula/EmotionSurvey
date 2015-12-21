@@ -22,7 +22,6 @@ import java.util.List;
 
 public class CacheImages extends Activity {
 
-    boolean cacheTrainingImages, isTestSurvey;
     ArrayList<String> imagesToCache = new ArrayList<String>();
     ProgressBar progressBar;
     String surveyId;
@@ -31,11 +30,10 @@ public class CacheImages extends Activity {
         Intent intent = new Intent(CacheImages.this,
                 MainActivity.class);
         intent.putExtra("SurveyId", surveyId);
-        intent.putExtra("isTestSurvey", isTestSurvey);
         startActivity(intent);
     }
 
-    protected void startCacheImages(){
+    protected void startCacheImages() {
 
         for (String url : imagesToCache) {
             PicassoSingletonImageHandler.getSharedInstance(getApplicationContext()).with(getApplicationContext())
@@ -76,44 +74,39 @@ public class CacheImages extends Activity {
         progressBar.setMax(3);
         progressBar.setProgress(0);
 
-        cacheTrainingImages = getIntent().getBooleanExtra("cacheTrainingImages", false);
+        surveyId = getIntent().getStringExtra("SurveyId");
 
-        if (!cacheTrainingImages) {
-            surveyId = getIntent().getStringExtra("SurveyId");
-            isTestSurvey = getIntent().getBooleanExtra("SurveyId", false);
+        ParseQuery<ParseObject> innerquery = ParseQuery.getQuery("Survey");
+        innerquery.whereEqualTo("objectId", surveyId);
 
-            ParseQuery<ParseObject> innerquery = ParseQuery.getQuery("Survey");
-            innerquery.whereEqualTo("objectId", surveyId);
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyQuestions");
+        query.whereMatchesQuery("SurveyId", innerquery);
 
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("SurveyQuestions");
-            query.whereMatchesQuery("SurveyId", innerquery);
-
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> objectList, com.parse.ParseException e) {
-                    if (e == null) {
-                        // object will be your game score
-                        ParseObject questionObj;
-                        for (ParseObject obj : objectList) {
-                            try {
-                                questionObj = obj.getParseObject("QuestionId");
-                                questionObj.fetchIfNeeded();
-                                imagesToCache.add(questionObj.getString("ImageURI"));
-                            } catch (ParseException e1) {
-                                e1.printStackTrace();
-                            }
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objectList, com.parse.ParseException e) {
+                if (e == null) {
+                    // object will be your game score
+                    ParseObject questionObj;
+                    for (ParseObject obj : objectList) {
+                        try {
+                            questionObj = obj.getParseObject("QuestionId");
+                            questionObj.fetchIfNeeded();
+                            imagesToCache.add(questionObj.getString("ImageURI"));
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
                         }
-                        progressBar.setMax(imagesToCache.size());
-                        progressBar.setProgress(0);
-                        startCacheImages();
-                        //NavigateToNextActivity();
-                    } else {
-                        // something went wrong
                     }
+                    progressBar.setMax(imagesToCache.size());
+                    progressBar.setProgress(0);
+                    startCacheImages();
+                    //NavigateToNextActivity();
+                } else {
+                    // something went wrong
                 }
-            });
-        }
+            }
+        });
+
 
     }
-
 }

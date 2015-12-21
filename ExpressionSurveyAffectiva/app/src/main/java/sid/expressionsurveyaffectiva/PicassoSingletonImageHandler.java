@@ -19,6 +19,7 @@ public class PicassoSingletonImageHandler {
         {
             instance = new Picasso.Builder(context).executor(Executors.newSingleThreadExecutor()).memoryCache(Cache.NONE).indicatorsEnabled(true).build();
         }
+        instance.setIndicatorsEnabled(false);
         return instance;
     }
 }
